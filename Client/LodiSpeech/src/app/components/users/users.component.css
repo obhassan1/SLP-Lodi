@@ -1,0 +1,13 @@
+.user{display:grid;grid-template-columns:1.3fr 1fr .7fr .7fr;gap:16px;align-items:center;padding:14px;border-top:1px solid #eee8f1}
+.user.head{border:0;background:#faf8fb;color:#786c7d;font-size:11px}
+.user>span{display:flex;align-items:center;gap:10px}
+.user i{width:37px;height:37px;display:grid;place-items:center;border-radius:50%;background:#f4ecfa;color:#6f00a8;font-style:normal;font-weight:800}
+.user code{font-size:12px}
+.user em{font-style:normal}
+.user strong{color:#287a5b}
+.user strong.inactive{color:#a94b60}
+.error{color:#a94b60;background:#fff0f3;padding:10px;border-radius:8px}
+@media(max-width:700px){.user{grid-template-columns:1fr 1fr}
+.user.head{display:none}
+}
+

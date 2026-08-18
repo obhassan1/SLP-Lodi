@@ -1,0 +1,39 @@
+<section class="page">
+<header class="page-header">
+<div>
+<small>FINANCES</small>
+<h1>Payments</h1>
+</div>
+</header>
+<div class="totals">
+<article class="panel">
+<small>Total billed</small>
+<b>{{total|number:'1.2-2'}}</b>
+</article>
+<article class="panel">
+<small>Outstanding</small>
+<b>{{outstanding|number:'1.2-2'}}</b>
+</article>
+<article class="panel">
+<small>Unpaid sessions</small>
+<b>{{(appointments|unpaidCount)}}</b>
+</article>
+</div>
+<article class="panel table">
+<div class="row head">
+<b>Patient</b>
+<b>Date</b>
+<b>Amount</b>
+<b>Status</b>
+<b>Action</b>
+</div>
+<div class="row" *ngFor="let a of appointments">
+<b>{{name(a)}}</b>
+<span>{{a.startsAt|date:'mediumDate'}}</span>
+<span>{{a.amount|number:'1.2-2'}}</span>
+<em class="status" [class.unpaid]="!a.paid">{{a.paid?'Paid':'Unpaid'}}</em>
+<button (click)="markPaid(a)">{{a.paid?'Mark unpaid':'Mark paid'}}</button>
+</div>
+<p class="empty" *ngIf="!appointments.length">No payment records yet.</p>
+</article>
+</section>

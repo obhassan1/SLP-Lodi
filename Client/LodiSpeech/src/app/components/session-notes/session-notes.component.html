@@ -1,0 +1,56 @@
+<section class="page">
+<header class="page-header">
+<div>
+<small>CLINICAL RECORDS</small>
+<h1>Session notes</h1>
+</div>
+<button class="primary" (click)="showForm=true" [disabled]="!selected">＋ Add session note</button>
+</header>
+<label class="patient-select">Patient<select [ngModel]="selected?._id" (ngModelChange)="select($event)">
+<option *ngFor="let p of patients" [value]="p._id">{{p.name}}</option>
+</select>
+</label>
+<article class="panel" *ngIf="selected">
+<div class="patient">
+<i>{{selected.name.slice(0,2)|uppercase}}</i>
+<div>
+<h2>{{selected.name}}</h2>
+<p>{{selected.therapyFocus}}</p>
+</div>
+</div>
+<article class="note" *ngFor="let n of selected.notes">
+<div>
+<b>{{n.focus}}</b>
+<small>{{n.sessionDate|date:'mediumDate'}}</small>
+</div>
+<p>{{n.note}}</p>
+<em class="status" [class.unpaid]="!n.paid">{{n.paid?'Paid':'Unpaid'}}</em>
+</article>
+<p class="empty" *ngIf="!selected.notes.length">No session notes for this patient.</p>
+</article>
+</section>
+<div class="backdrop" *ngIf="showForm&&selected">
+<form class="form-card" [formGroup]="form" (ngSubmit)="save()">
+<div class="form-title">
+<h2>New note · {{selected.name}}</h2>
+<button class="close" type="button" (click)="showForm=false">×</button>
+</div>
+<div class="form-grid">
+<label>Session date<input type="date" formControlName="sessionDate">
+</label>
+<label>Session focus<input formControlName="focus">
+</label>
+<label class="wide">Clinical note<textarea rows="6" formControlName="note">
+</textarea>
+</label>
+<label>Amount<input type="number" formControlName="amount">
+</label>
+<label>
+<input type="checkbox" formControlName="paid"> Session paid</label>
+</div>
+<div class="form-actions">
+<button class="cancel" type="button" (click)="showForm=false">Cancel</button>
+<button class="primary" type="submit" [disabled]="form.invalid">Save note</button>
+</div>
+</form>
+</div>

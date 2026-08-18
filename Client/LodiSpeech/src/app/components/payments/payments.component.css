@@ -1,0 +1,12 @@
+.totals{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:15px}
+.totals small,.totals b{display:block}
+.totals small{color:#786c7d}
+.totals b{font:700 27px Georgia;margin-top:8px}
+.row{display:grid;grid-template-columns:1.2fr 1fr .7fr .7fr .8fr;gap:15px;align-items:center;padding:14px;border-top:1px solid #eee8f1;font-size:12px}
+.row.head{border:0;background:#faf8fb;color:#786c7d}
+.row button{border:1px solid #e3d4ea;background:#fff;color:#6f00a8;border-radius:8px;padding:8px}
+@media(max-width:750px){.totals{grid-template-columns:1fr}
+.row{grid-template-columns:1fr 1fr}
+.row.head{display:none}
+}
+

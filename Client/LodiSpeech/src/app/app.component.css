@@ -1,0 +1,127 @@
+.shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  min-height: 100vh;
+  background: #f8f6fa;
+}
+
+aside {
+  position: sticky;
+  top: 0;
+  width: 240px;
+  height: 100vh;
+  padding: 20px 18px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: #ffffff;
+  border-right: 1px solid #eee8f1;
+}
+
+/* Dashboard logo container */
+
+aside .logo {
+  width: 100%;
+  height: 95px;
+  margin: 0 0 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Dashboard logo image */
+
+aside .logo img {
+  position: static;
+  display: block;
+  width: 195px;
+  height: 85px;
+  max-width: 195px;
+  max-height: 85px;
+  margin: 0;
+  padding: 0;
+  object-fit: contain;
+  object-position: center;
+  transform: none;
+}
+
+/* Sidebar navigation */
+
+aside nav {
+  display: grid;
+  gap: 7px;
+  margin-top: 0;
+}
+
+aside nav a {
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #786c7d;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+aside nav a:hover,
+aside nav a.active {
+  background: #f4ecfa;
+  color: #6f00a8;
+}
+
+aside nav a span {
+  display: inline-block;
+}
+
+/* Main dashboard content */
+
+main {
+  min-width: 0;
+  min-height: 100vh;
+  background: #f8f6fa;
+}
+
+/* Tablet and mobile */
+
+@media (max-width: 760px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  aside {
+    position: static;
+    width: 100%;
+    height: auto;
+    padding: 12px;
+    overflow: visible;
+  }
+
+  aside .logo {
+    width: 190px;
+    height: 70px;
+    margin: 0 auto 8px;
+  }
+
+  aside .logo img {
+    width: 180px;
+    height: 65px;
+    max-width: 180px;
+    max-height: 65px;
+  }
+
+  aside nav {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+  }
+
+  aside nav a {
+    flex-shrink: 0;
+    padding: 9px 11px;
+    white-space: nowrap;
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,57 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+      <small>{{today | date:'EEEE, d MMMM'}}</small>
+      <h1>{{greeting}}, {{displayName}} ♡</h1>
+    </div>
+    <a class="primary" routerLink="/patients">＋ Add patient</a>
+  </header>
+
+  <div class="stats">
+    <article class="hero">
+      <div>
+        <small>TODAY AT A GLANCE</small>
+        <h2>{{upcomingAppointments.length}} upcoming sessions</h2>
+        <p *ngIf="auth.user?.role==='admin'">All therapists’ appointments, patients and payments are included.</p>
+        <p *ngIf="auth.user?.role==='therapist'">Your assigned patients, appointments and clinical notes are together.</p>
+      </div>
+      <strong>{{upcomingAppointments.length}}</strong>
+    </article>
+
+    <article class="panel">
+      <span>Patients</span>
+      <b>{{patients.length}}</b>
+      <small>{{auth.user?.role==='admin' ? 'All active records' : 'Assigned records'}}</small>
+    </article>
+
+    <article class="panel">
+      <span>Unpaid</span>
+      <b>{{unpaid}}</b>
+      <small>Needs follow-up</small>
+    </article>
+
+    <article class="panel" *ngIf="auth.user?.role==='admin'">
+      <span>Paid revenue</span>
+      <b>{{revenue | number:'1.2-2'}}</b>
+      <small>Across all therapists</small>
+    </article>
+  </div>
+
+  <article class="panel schedule">
+    <div class="title">
+      <div>
+<small>SCHEDULE</small>
+<h2>Upcoming appointments</h2>
+</div>
+      <a routerLink="/appointments">View all →</a>
+    </div>
+    <div class="appointment" *ngFor="let appointment of upcomingAppointments | slice:0:5">
+      <time>{{appointment.startsAt | date:'shortTime'}}<small>{{appointment.startsAt | date:'mediumDate'}}</small>
+</time>
+      <b>{{patientName(appointment)}}</b>
+      <span *ngIf="auth.user?.role==='admin'">{{therapistName(appointment)}}</span>
+      <span class="status" [class.unpaid]="!appointment.paid">{{appointment.paid ? 'Paid' : 'Unpaid'}}</span>
+    </div>
+    <p class="empty" *ngIf="!upcomingAppointments.length">No upcoming appointments.</p>
+  </article>
+</section>

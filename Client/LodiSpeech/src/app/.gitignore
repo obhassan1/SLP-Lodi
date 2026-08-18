@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+Client/LodiSpeech/node_modules/
+Server/node_modules/
+
+# Environment secrets
+.env
+Server/.env
+*.env.local
+
+# Angular output
+Client/LodiSpeech/dist/
+dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

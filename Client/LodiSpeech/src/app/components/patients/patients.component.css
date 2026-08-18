@@ -1,0 +1,58 @@
+.toolbar { margin-bottom: 15px; }
+
+.toolbar input { width: min(360px, 100%); padding: 12px 14px; border: 1px solid #e5dbe8; border-radius: 11px; }
+
+.patient-grid { display: grid; grid-template-columns: 0.8fr 1.7fr; gap: 15px; }
+
+.list { padding: 10px; align-self: start; }
+
+.list > button { width: 100%; border: 0; border-bottom: 1px solid #eee8f1; background: #fff; display: flex; align-items: center; gap: 12px; text-align: left; padding: 14px; border-radius: 10px; }
+
+.list > button.selected { background: #f4ecfa; }
+
+.list i { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: #f4ecfa; color: #6f00a8; font-style: normal; font-weight: 700; }
+
+.list b, .list small, .info small, .info b, .info span { display: block; }
+
+.list small, .info small, .info span { color: #786c7d; font-size: 11px; }
+
+.detail h2 { font-family: Georgia, serif; }
+
+.detail > p { color: #786c7d; }
+
+.info { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; background: #faf8fb; padding: 18px; border-radius: 13px; }
+
+.info b { margin: 5px 0; }
+
+.history, .assignments { margin-top: 22px; border-top: 1px solid #eee8f1; padding-top: 18px; }
+
+.history > small, .assignments > small { color: #6f00a8; font-weight: 800; letter-spacing: 0.08em; }
+
+.history h3, .assignments h3 { margin: 5px 0 12px; }
+
+.history-row { display: grid; grid-template-columns: 1fr auto auto; gap: 12px; align-items: center; border-top: 1px solid #f0eaf2; padding: 12px 0; }
+
+.history-row small { display: block; margin-top: 4px; color: #786c7d; }
+
+.clinical-note { border-left: 3px solid #a76ac4; background: #faf7fb; border-radius: 0 12px 12px 0; margin: 10px 0; padding: 14px; }
+
+.clinical-note small { display: block; color: #786c7d; margin-top: 4px; }
+
+.clinical-note p { line-height: 1.6; color: #514657; }
+
+.assignments label { display: flex; gap: 10px; align-items: center; padding: 9px 0; cursor: pointer; }
+
+.assignments label input { accent-color: #7200a8; width: 17px; height: 17px; }
+
+.assignments label b, .assignments label small { display: block; }
+
+.assignments label small { color: #786c7d; }
+
+.assignments .primary { margin-top: 10px; }
+
+.assignment-message { margin-left: 12px; color: #5f3472; font-size: 12px; }
+
+@media (max-width: 750px) { .patient-grid { grid-template-columns: 1fr; }
+ .history-row { grid-template-columns: 1fr; }
+ }
+

@@ -1,0 +1,53 @@
+<section class="page">
+<header class="page-header">
+<div>
+<small>TEAM ACCESS</small>
+<h1>Users</h1>
+</div>
+<button class="primary" (click)="showForm=true">＋ Add user</button>
+</header>
+<article class="panel">
+<div class="user head">
+<b>Name</b>
+<b>Username</b>
+<b>Role</b>
+<b>Status</b>
+</div>
+<div class="user" *ngFor="let user of users">
+<span>
+<i>{{user.name.slice(0,2)|uppercase}}</i>
+<b>{{user.name}}</b>
+</span>
+<code>{{user.username}}</code>
+<em>{{user.role|titlecase}}</em>
+<strong [class.inactive]="!user.active">{{user.active?'Active':'Inactive'}}</strong>
+</div>
+</article>
+</section>
+<div class="backdrop" *ngIf="showForm">
+<form class="form-card" [formGroup]="form" (ngSubmit)="save()">
+<div class="form-title">
+<h2>Add user</h2>
+<button class="close" type="button" (click)="showForm=false">×</button>
+</div>
+<div class="form-grid">
+<label>Full name<input formControlName="name">
+</label>
+<label>Username<input formControlName="username" autocomplete="off">
+</label>
+<label>Password<input type="password" formControlName="password" autocomplete="new-password">
+<small>At least 8 characters</small>
+</label>
+<label *ngIf="auth.user?.role==='admin'">Role<select formControlName="role">
+<option value="therapist">Therapist</option>
+<option value="admin">Administrator</option>
+</select>
+</label>
+<p class="wide error" *ngIf="error">{{error}}</p>
+</div>
+<div class="form-actions">
+<button class="cancel" type="button" (click)="showForm=false">Cancel</button>
+<button class="primary" type="submit" [disabled]="form.invalid">Create user</button>
+</div>
+</form>
+</div>

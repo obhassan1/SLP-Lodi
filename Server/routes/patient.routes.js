@@ -1,0 +1,10 @@
+const router = require('express').Router();
+const c = require('../controllers/patient.controller');
+router.get('/', c.list);
+router.post('/', c.create);
+router.get('/:id', c.get);
+router.put('/:id', c.update);
+router.put('/:id/assign', c.assign);
+router.post('/:id/notes', c.addNote);
+router.delete('/:id', c.remove);
+module.exports = router;

@@ -1,0 +1,11 @@
+.patient-select{display:grid;gap:6px;width:min(350px,100%);font-size:11px;font-weight:700;margin-bottom:15px}
+.patient-select select{padding:11px;border:1px solid #e5dbe8;border-radius:10px}
+.patient{display:flex;align-items:center;gap:13px}
+.patient i{width:50px;height:50px;display:grid;place-items:center;border-radius:50%;background:#f4ecfa;color:#6f00a8;font-style:normal;font-weight:700}
+.patient h2{font-family:Georgia,serif;margin:0}
+.patient p{color:#786c7d;margin:5px 0}
+.note{position:relative;border-top:1px solid #eee8f1;padding:16px 90px 10px 0}
+.note small{margin-left:10px;color:#786c7d}
+.note p{color:#5f5563;font-size:12px;line-height:1.6}
+.note em{position:absolute;right:0;top:14px}
+

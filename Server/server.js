@@ -1,0 +1,21 @@
+require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const authRoutes = require('./routes/auth.routes');
+const userRoutes = require('./routes/user.routes');
+const patientRoutes = require('./routes/patient.routes');
+const appointmentRoutes = require('./routes/appointment.routes');
+const { requireAuth } = require('./middleware/auth.middleware');
+const app = express();
+app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:4200' }));
+app.use(express.json({ limit: '1mb' }));
+app.get('/api/health', (_req, res) => res.json({ ok: true }));
+app.use('/api/auth', authRoutes);
+app.use('/api/users', requireAuth, userRoutes);
+app.use('/api/patients', requireAuth, patientRoutes);
+app.use('/api/appointments', requireAuth, appointmentRoutes);
+app.use((error, _req, res, _next) => { console.error(error); res.status(error.status || 500).json({ message: error.message || 'Server error' }); });
+if (!process.env.JWT_SECRET)
+    throw new Error('JWT_SECRET is required');
+mongoose.connect(process.env.MONGODB_URI).then(() => app.listen(process.env.PORT || 3000, () => console.log('Speech therapy API ready'))).catch(error => { console.error(error); process.exit(1); });

@@ -1,0 +1,122 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+<small>PATIENT RECORDS</small>
+<h1>Patients</h1>
+</div>
+    <button class="primary" (click)="showForm=true">＋ Add new patient</button>
+  </header>
+
+  <div class="toolbar">
+<input [(ngModel)]="search" (input)="load()" placeholder="Search by patient name...">
+</div>
+
+  <div class="patient-grid">
+    <article class="panel list">
+      <button *ngFor="let patient of patients" (click)="selectPatient(patient)" [class.selected]="patient._id===selected?._id">
+        <i>{{patient.name.slice(0,2) | uppercase}}</i>
+        <span>
+<b>{{patient.name}}</b>
+<small>{{patient.therapyFocus}}</small>
+</span>
+      </button>
+      <p class="empty" *ngIf="!patients.length&&!loading">No patients found.</p>
+    </article>
+
+    <article class="panel detail" *ngIf="selected">
+      <h2>{{selected.name}}</h2>
+      <p>DOB: {{selected.dateOfBirth | date:'longDate'}}</p>
+
+      <div class="info">
+        <div>
+<small>Caregiver</small>
+<b>{{selected.caregivers.length ? selected.caregivers[0].name : 'Not entered'}}</b>
+<span>{{selected.caregivers.length ? selected.caregivers[0].relationship : ''}}</span>
+</div>
+        <div>
+<small>Contact</small>
+<b>{{selected.contact.phone}}</b>
+<span>{{selected.contact.email}}</span>
+</div>
+        <div>
+<small>Previous appointment</small>
+<b>{{previousAppointment ? (previousAppointment.startsAt | date:'medium') : 'None'}}</b>
+</div>
+        <div>
+<small>Next appointment</small>
+<b>{{nextAppointment ? (nextAppointment.startsAt | date:'medium') : 'None scheduled'}}</b>
+</div>
+      </div>
+
+      <section class="history">
+        <small>APPOINTMENT HISTORY</small>
+        <h3>From the first appointment</h3>
+        <div class="history-row" *ngFor="let appointment of appointments">
+          <div>
+<b>{{appointment.startsAt | date:'medium'}}</b>
+<small>{{therapistName(appointment)}}</small>
+</div>
+          <span>{{appointment.status | titlecase}}</span>
+          <em class="status" [class.unpaid]="!appointment.paid">{{appointment.paid ? 'Paid' : 'Unpaid'}}</em>
+        </div>
+        <p class="empty" *ngIf="!appointments.length">No appointment history.</p>
+      </section>
+
+      <section class="history" *ngIf="auth.user?.role==='therapist'">
+        <small>CLINICAL HISTORY</small>
+        <h3>Session notes from day one</h3>
+        <article class="clinical-note" *ngFor="let note of selected.notes || []">
+          <div>
+<b>{{note.focus}}</b>
+<small>{{note.sessionDate | date:'mediumDate'}} · {{note.therapistName}}</small>
+</div>
+          <p>{{note.note}}</p>
+        </article>
+        <p class="empty" *ngIf="!(selected.notes || []).length">No clinical notes yet.</p>
+      </section>
+
+      <section class="assignments" *ngIf="auth.user?.role==='admin'">
+        <small>THERAPIST ACCESS</small>
+<h3>Assign this patient</h3>
+        <label *ngFor="let therapist of therapists">
+<input type="checkbox" [checked]="selectedTherapistIds.includes(therapist._id)" (change)="toggleTherapist(therapist._id,$any($event.target).checked)">
+<span>
+<b>{{therapist.name}}</b>
+<small>@{{therapist.username}}</small>
+</span>
+</label>
+        <button class="primary" (click)="saveAssignments()">Save access</button>
+        <span class="assignment-message">{{assignmentMessage}}</span>
+      </section>
+    </article>
+  </div>
+</section>
+
+<div class="backdrop" *ngIf="showForm">
+  <form class="form-card" [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-title">
+<h2>Add new patient</h2>
+<button class="close" type="button" (click)="showForm=false">×</button>
+</div>
+    <div class="form-grid">
+      <label>Patient name<input formControlName="name">
+</label>
+      <label>Date of birth<input type="date" formControlName="dateOfBirth">
+</label>
+      <label>Caregiver<input formControlName="caregiver">
+</label>
+      <label>Relationship<input formControlName="relationship">
+</label>
+      <label>Phone<input formControlName="phone">
+</label>
+      <label>Email<input type="email" formControlName="email">
+</label>
+      <label class="wide">Therapy focus<input formControlName="therapyFocus">
+</label>
+    </div>
+    <div class="form-actions">
+<button class="cancel" type="button" (click)="showForm=false">Cancel</button>
+<button class="primary" type="submit" [disabled]="form.invalid">Save patient</button>
+</div>
+  </form>
+</div>

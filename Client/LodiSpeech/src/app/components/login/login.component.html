@@ -1,0 +1,17 @@
+<main class="login-page">
+<a class="back" routerLink="/">← Return to website</a>
+<section class="login-card">
+<img src="assets/lodi-logo.jpeg" alt="Lodi Thebian">
+<span>PRIVATE PRACTICE PORTAL</span>
+<h1>Welcome back</h1>
+<p>Sign in to access assigned patient records and appointments.</p>
+<form [formGroup]="form" (ngSubmit)="login()">
+<label>Username<input formControlName="username" autocomplete="username">
+</label>
+<label>Password<input type="password" formControlName="password" autocomplete="current-password">
+</label>
+<p class="error" *ngIf="error">{{error}}</p>
+<button type="submit" [disabled]="form.invalid||loading">{{loading?'Signing in...':'Sign in'}}</button>
+</form>
+</section>
+</main>

@@ -1,0 +1,15 @@
+.login-page{min-height:100vh;display:grid;place-items:center;background:radial-gradient(circle at 80% 20%,#e7c9f4,transparent 32%),linear-gradient(135deg,#fbf8fc,#f1e5f7);padding:25px}
+.back{position:fixed;left:25px;top:22px;color:#6f00a8;text-decoration:none;font-weight:700}
+.login-card{width:min(440px,100%);background:#fff;border:1px solid #eadff0;border-radius:24px;padding:34px;box-shadow:0 25px 70px #4b1a6026}
+.login-card img{display:block;width:220px;height:95px;object-fit:contain;margin:0 auto 15px}
+.login-card>span{display:block;text-align:center;color:#6f00a8;font-size:10px;font-weight:800;letter-spacing:.16em}
+.login-card h1{text-align:center;font:700 34px Georgia;margin:12px 0 7px}
+.login-card>p{text-align:center;color:#786c7d;font-size:13px;line-height:1.5}
+.login-card form{display:grid;gap:15px;margin-top:25px}
+.login-card label{display:grid;gap:7px;font-size:11px;font-weight:700}
+.login-card input{padding:13px;border:1px solid #e5d9ea;border-radius:10px;outline:none}
+.login-card input:focus{border-color:#9b4cbd;box-shadow:0 0 0 3px #f2e6f7}
+.login-card button{border:0;border-radius:11px;padding:13px;background:linear-gradient(135deg,#7800b4,#52007e);color:#fff;font-weight:800}
+.login-card button:disabled{opacity:.55}
+.error{color:#a33c55!important;background:#fff0f3;padding:10px;border-radius:8px;margin:0!important;text-align:left!important}
+

@@ -1,0 +1,90 @@
+<section class="page">
+  <header class="page-header">
+    <div>
+<small>SCHEDULE</small>
+<h1>Appointments</h1>
+</div>
+    <button class="primary" (click)="showForm=true">＋ Book appointment</button>
+  </header>
+
+  <p class="error" *ngIf="error">{{error}}</p>
+
+  <article class="panel">
+    <div class="appointment head">
+      <b>Date and time</b>
+<b>Patient</b>
+<b>Therapist</b>
+<b>Status</b>
+<b>Payment</b>
+<b>Session</b>
+    </div>
+    <div class="appointment" *ngFor="let appointment of appointments">
+      <span>{{appointment.startsAt | date:'medium'}}</span>
+      <b>{{patientName(appointment)}}</b>
+      <span>{{therapistName(appointment)}}</span>
+      <span>{{appointment.status | titlecase}}</span>
+      <em class="status" [class.unpaid]="!appointment.paid">{{appointment.paid ? 'Paid' : 'Unpaid'}}</em>
+      <button class="note-button" *ngIf="auth.user?.role==='therapist'&&canAddNote(appointment)" (click)="openSessionNote(appointment)">{{appointment.status==='completed' ? 'Edit note' : 'Add note'}}</button>
+      <span *ngIf="auth.user?.role==='therapist'&&!canAddNote(appointment)">Available after session</span>
+      <span *ngIf="auth.user?.role==='admin'">{{appointment.durationMinutes}} min</span>
+    </div>
+    <p class="empty" *ngIf="!appointments.length">No appointments yet.</p>
+  </article>
+</section>
+
+<div class="backdrop" *ngIf="showForm">
+  <form class="form-card" [formGroup]="form" (ngSubmit)="save()">
+    <div class="form-title">
+<h2>Book appointment</h2>
+<button class="close" type="button" (click)="showForm=false">×</button>
+</div>
+    <div class="form-grid">
+      <label>Patient<select formControlName="patient">
+<option value="">Choose patient</option>
+<option *ngFor="let patient of patients" [value]="patient._id">{{patient.name}}</option>
+</select>
+</label>
+      <label *ngIf="auth.user?.role==='admin'">Therapist<select formControlName="therapist">
+<option value="">Choose therapist</option>
+<option *ngFor="let therapist of therapists" [value]="therapist._id">{{therapist.name}}</option>
+</select>
+</label>
+      <label>Date and time<input type="datetime-local" formControlName="startsAt">
+</label>
+      <label>Duration<input type="number" formControlName="durationMinutes">
+</label>
+      <label>Amount<input type="number" formControlName="amount">
+</label>
+      <label class="wide">Scheduling note<textarea rows="3" formControlName="note">
+</textarea>
+</label>
+      <label>
+<input type="checkbox" formControlName="paid"> Paid</label>
+    </div>
+    <div class="form-actions">
+<button class="cancel" type="button" (click)="showForm=false">Cancel</button>
+<button class="primary" type="submit" [disabled]="form.invalid">Save appointment</button>
+</div>
+  </form>
+</div>
+
+<div class="backdrop" *ngIf="showNoteForm&&selectedAppointment">
+  <form class="form-card" [formGroup]="noteForm" (ngSubmit)="saveSessionNote()">
+    <div class="form-title">
+<h2>Session note · {{patientName(selectedAppointment)}}</h2>
+<button class="close" type="button" (click)="showNoteForm=false">×</button>
+</div>
+    <p>{{selectedAppointment.startsAt | date:'medium'}}</p>
+    <div class="form-grid">
+      <label class="wide">Session focus<input formControlName="focus">
+</label>
+      <label class="wide">Clinical session note<textarea rows="7" formControlName="note">
+</textarea>
+</label>
+    </div>
+    <div class="form-actions">
+<button class="cancel" type="button" (click)="showNoteForm=false">Cancel</button>
+<button class="primary" type="submit" [disabled]="noteForm.invalid">Save session note</button>
+</div>
+  </form>
+</div>

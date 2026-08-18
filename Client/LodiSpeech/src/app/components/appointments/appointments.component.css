@@ -1,0 +1,16 @@
+.appointment { display: grid; grid-template-columns: 1.3fr 1fr 1fr 0.7fr 0.7fr 0.8fr; gap: 15px; align-items: center; padding: 15px; border-top: 1px solid #eee8f1; }
+
+.appointment.head { border: 0; background: #faf8fb; color: #786c7d; font-size: 11px; }
+
+.appointment span, .appointment b { font-size: 12px; }
+
+.note-button { border: 1px solid #d9c5e3; background: #f7effa; color: #6f00a8; border-radius: 9px; padding: 8px; font-weight: 700; }
+
+.note-button:hover { background: #6f00a8; color: #fff; }
+
+.error { background: #fff0f3; color: #a33b55; padding: 12px; border-radius: 10px; }
+
+@media (max-width: 850px) { .appointment { grid-template-columns: 1fr 1fr; }
+ .appointment.head { display: none; }
+ }
+

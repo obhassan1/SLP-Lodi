@@ -1,0 +1,32 @@
+:root{--purple:#6f00a8;--purple-dark:#4d0478;--lavender:#f4ecfa;--ink:#24192a;--muted:#786c7d;--line:#eee8f1}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:Inter,Arial,sans-serif;background:#f8f6fa;color:var(--ink)}
+button,a,[role=button]{cursor:pointer}
+button:disabled{cursor:not-allowed;opacity:.55}
+button,input,textarea,select{font:inherit}
+.primary{border:0;background:linear-gradient(135deg,#7b00b7,#570083);color:#fff;border-radius:11px;padding:12px 17px;font-weight:700}
+.page{padding:30px 38px}
+.page-header{display:flex;justify-content:space-between;align-items:center;gap:15px;margin-bottom:24px}
+.page-header h1{font:700 28px Georgia,serif;margin:4px 0}
+.page-header small{color:var(--muted)}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 8px 30px rgba(79,36,99,.05)}
+.empty{color:var(--muted);text-align:center;padding:30px}
+.status{display:inline-block;border-radius:30px;padding:5px 10px;font-size:11px;font-weight:700;color:#287a5b;background:#e8f5ef}
+.status.unpaid{color:#a94b60;background:#fff0f3}
+.backdrop{position:fixed;inset:0;z-index:50;background:rgba(33,16,42,.52);display:grid;place-items:center;padding:20px}
+.form-card{width:min(650px,100%);max-height:90vh;overflow:auto;background:#fff;border-radius:20px;padding:24px}
+.form-title,.form-actions{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.form-title h2{font-family:Georgia,serif}
+.close{border:0;background:var(--lavender);color:var(--purple);width:34px;height:34px;border-radius:50%;font-size:21px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-grid label{display:grid;gap:6px;font-size:11px;font-weight:700}
+.form-grid input,.form-grid textarea,.form-grid select{padding:11px;border:1px solid #e5dbe8;border-radius:9px}
+.wide{grid-column:1/-1}
+.form-actions{justify-content:flex-end;border-top:1px solid var(--line);margin-top:18px;padding-top:15px}
+.form-actions .cancel{border:0;background:#fff;color:var(--muted)}
+@media(max-width:700px){.page{padding:20px 15px}
+.page-header{align-items:flex-start}
+.form-grid{grid-template-columns:1fr}
+.wide{grid-column:auto}
+}
+

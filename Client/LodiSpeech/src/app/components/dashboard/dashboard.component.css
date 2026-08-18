@@ -1,0 +1,18 @@
+.stats{display:grid;grid-template-columns:2fr 1fr 1fr;gap:15px}
+.stats article{min-height:145px}
+.stats article:not(.hero) span,.stats article:not(.hero) small,.stats article:not(.hero) b{display:block}
+.stats article:not(.hero) b{font:700 29px Georgia;margin:8px 0}
+.hero{padding:24px;border-radius:18px;background:linear-gradient(120deg,#6f00a8,#ad4fcb);color:#fff;display:flex;justify-content:space-between}
+.hero h2{font-family:Georgia,serif}
+.hero p{font-size:12px}
+.hero>strong{font:700 38px Georgia;align-self:center}
+.schedule{margin-top:16px}
+.title{display:flex;justify-content:space-between;align-items:center}
+.title h2{font-family:Georgia,serif}
+.title a{color:#6f00a8;text-decoration:none;font-weight:700}
+.appointment{display:grid;grid-template-columns:130px 1fr auto;align-items:center;border-top:1px solid #eee8f1;padding:15px}
+.appointment time small{display:block;color:#786c7d;margin-top:4px}
+@media(max-width:800px){.stats{grid-template-columns:1fr 1fr}
+.hero{grid-column:1/-1}
+}
+

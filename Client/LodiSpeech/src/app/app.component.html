@@ -1,0 +1,70 @@
+<router-outlet *ngIf="publicPage"></router-outlet>
+
+<div
+  class="shell"
+  *ngIf="!publicPage"
+>
+  <aside>
+    <div class="logo">
+      <img
+        src="assets/lodi-logo.jpeg"
+        alt="Lodi Thebian logo"
+      />
+    </div>
+
+    <nav>
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+      >
+        ⌂
+        <span>Overview</span>
+      </a>
+
+      <a
+        routerLink="/patients"
+        routerLinkActive="active"
+      >
+        ♙
+        <span>Patients</span>
+      </a>
+
+      <a
+        routerLink="/appointments"
+        routerLinkActive="active"
+      >
+        ▣
+        <span>Appointments</span>
+      </a>
+
+      <a
+        routerLink="/payments"
+        routerLinkActive="active"
+      >
+        ◉
+        <span>Payments</span>
+      </a>
+
+      <a
+        *ngIf="auth.user?.role === 'therapist'"
+        routerLink="/session-notes"
+        routerLinkActive="active"
+      >
+        ✎
+        <span>Session notes</span>
+      </a>
+
+      <a
+        routerLink="/users"
+        routerLinkActive="active"
+      >
+        ⚙
+        <span>Users</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main>
+    <router-outlet></router-outlet>
+  </main>
+</div>
