@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { User } from '../models/patient.model';
+import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class UserService {
-    private api = 'http://localhost:3000/api/users';
+    private api = `${environment.apiUrl}/users`;
     constructor(private http: HttpClient) { }
     list() { return this.http.get<User[]>(this.api); }
     create(input: {

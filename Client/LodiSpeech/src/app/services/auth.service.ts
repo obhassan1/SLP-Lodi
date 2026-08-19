@@ -2,9 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, tap } from 'rxjs';
 import { User } from '../models/patient.model';
+import { environment } from '../../environments/environment';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-    private api = 'http://localhost:3000/api';
+    private api = environment.apiUrl;
     private userSubject = new BehaviorSubject<User | null>(this.readUser());
     user$ = this.userSubject.asObservable();
     constructor(private http: HttpClient) { }
