@@ -404,86 +404,314 @@ footer span {
   margin-left: auto;
 }
 
-/* =====================================================
-   TABLET
-===================================================== */
-
 @media (max-width: 850px) {
 
-  .contact-inner {
-    padding: 0 20px;
+  .contact-bar {
+    display: none;
   }
 
   header {
-    min-height: 90px;
-    height: auto;
-    padding: 10px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 300;
+
+    min-height: 74px;
+    height: 74px;
+
+    padding: 8px 14px;
+
+    display: flex;
+    align-items: center;
     justify-content: space-between;
-    gap: 10px;
-    position: relative;
+
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+
+    border-bottom: 1px solid #f0e8f4;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
   }
 
   .brand img {
-    width: 240px;
-    height: 82px;
+    width: 145px;
+    height: 58px;
+
+    object-fit: contain;
+    object-position: left center;
   }
 
   .menu {
-    display: block;
+    display: grid;
+    place-items: center;
+
+    width: 44px;
+    height: 44px;
+
+    border: 0;
+    border-radius: 13px;
+
+    background: #f4eafa;
+    color: #6f00a8;
+
+    font-size: 22px;
+
+    cursor: pointer;
   }
 
   header nav {
     display: none;
+
     position: absolute;
-    z-index: 100;
-    top: 90px;
-    left: 20px;
-    right: 20px;
+
+    top: calc(100% + 8px);
+    left: 14px;
+    right: 14px;
+
     margin: 0;
+
+    padding: 12px;
+
     background: #fff;
-    padding: 20px;
-    border-radius: 14px;
-    box-shadow: 0 15px 40px #23142b26;
-    align-items: stretch;
+
+    border: 1px solid #eee5f2;
+    border-radius: 18px;
+
+    box-shadow:
+      0 18px 45px rgba(48, 20, 58, 0.14);
+
     flex-direction: column;
+    align-items: stretch;
+
+    gap: 4px;
   }
 
   header nav.open {
     display: flex;
   }
 
+  header nav a {
+    width: 100%;
+
+    padding: 13px 14px;
+
+    border-radius: 11px;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    color: #2f2534;
+  }
+
+  header nav a:hover {
+    background: #faf6fc;
+    color: #6f00a8;
+  }
+
+  header nav .book {
+    margin-top: 5px;
+
+    padding: 14px;
+
+    text-align: center;
+
+    border-radius: 14px;
+
+    background: linear-gradient(
+      135deg,
+      #7300ab,
+      #550082
+    );
+
+    color: #fff;
+  }
+
   .hero {
+    min-height: auto;
+
+    display: block;
+
+    padding: 52px 18px 55px;
+
+    background:
+      radial-gradient(
+        circle at 80% 45%,
+        rgba(221, 182, 241, 0.7),
+        transparent 50%
+      ),
+      linear-gradient(
+        145deg,
+        #fff 0%,
+        #fff 58%,
+        #f6ebfa 100%
+      );
+  }
+
+  .hero-copy {
+    max-width: 100%;
+  }
+
+  .kicker {
+    font-size: 10px;
+    line-height: 1.5;
+
+    letter-spacing: 0.14em;
+
+    margin-bottom: 12px;
+  }
+
+  .hero h1 {
+    font-size: 44px;
+    line-height: 1.02;
+
+    margin: 10px 0 18px;
+
+    max-width: 360px;
+  }
+
+  .hero h1 em {
+    display: block;
+
+    margin-top: 4px;
+  }
+
+  .hero-copy > p {
+    max-width: 360px;
+
+    font-size: 16px;
+    line-height: 1.65;
+
+    margin: 0;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+
+    gap: 12px;
+
+    margin-top: 25px;
+
+    max-width: 320px;
+  }
+
+  .primary-link {
+    width: 100%;
+
+    text-align: center;
+
+    padding: 15px 18px;
+
+    border-radius: 16px;
+  }
+
+  .text-link {
+    width: 100%;
+
+    padding: 10px 2px;
+
+    text-align: left;
+  }
+
+  .trust {
+    margin-top: 26px;
+
+    display: grid;
     grid-template-columns: 1fr;
-    padding: 55px 20px;
+
+    gap: 8px;
+
+    font-size: 11px;
   }
 
   .hero-art {
-    height: 410px;
+    margin-top: 25px;
+
+    height: 310px;
+  }
+
+  .speech-ring {
+    width: 215px;
+    height: 215px;
+  }
+
+  .speech-ring::before {
+    inset: -22px;
+  }
+
+  .speech-ring::after {
+    inset: -43px;
+  }
+
+  .speech-ring span {
+    font-size: 55px;
+  }
+
+  .speech-ring strong {
+    font-size: 23px;
+  }
+
+  .bubble {
+    font-size: 14px;
+
+    padding: 8px 13px;
+  }
+
+  .bubble.one {
+    left: 2%;
+    top: 18%;
+  }
+
+  .bubble.two {
+    right: 2%;
+    top: 25%;
+  }
+
+  .bubble.three {
+    left: 7%;
+    bottom: 10%;
   }
 
   .about {
-    padding: 70px 20px;
+    padding: 60px 18px;
+
     grid-template-columns: 1fr;
+
     gap: 25px;
   }
 
   .services {
-    padding: 70px 20px;
+    padding: 60px 18px;
   }
 
   .service-grid {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
   }
 
   .contact {
-    margin: 60px 20px;
+    margin: 45px 18px;
+
+    padding: 30px 22px;
+
+    border-radius: 22px;
+
     flex-direction: column;
     align-items: flex-start;
   }
 
   footer {
-    padding: 20px;
-    flex-wrap: wrap;
+    padding: 25px 18px;
+
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  footer img {
+    width: 170px;
+    height: 70px;
   }
 
   footer span {
@@ -491,66 +719,64 @@ footer span {
   }
 }
 
-/* =====================================================
-   PHONE
-===================================================== */
-
-@media (max-width: 540px) {
-
-  .contact-inner span:nth-child(2) {
-    display: none;
-  }
+@media (max-width: 430px) {
 
   header {
-    padding-left: 12px;
-    padding-right: 15px;
+    height: 68px;
+    min-height: 68px;
   }
 
   .brand img {
-    width: 220px;
-    height: 76px;
+    width: 130px;
+    height: 52px;
+  }
+
+  .menu {
+    width: 40px;
+    height: 40px;
+
+    font-size: 20px;
+  }
+
+  header nav {
+    left: 10px;
+    right: 10px;
+
+    border-radius: 16px;
   }
 
   .hero {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding: 42px 16px 48px;
   }
 
   .hero h1 {
-    font-size: 45px;
+    font-size: 39px;
   }
 
-  .hero-actions,
-  .trust {
-    align-items: flex-start;
-    flex-direction: column;
+  .hero-copy > p {
+    font-size: 15px;
   }
 
-  .speech-ring {
-    width: 240px;
-    height: 240px;
+  .hero-actions {
+    max-width: none;
   }
 
   .hero-art {
-    height: 340px;
+    height: 285px;
   }
 
-  .service-grid {
-    grid-template-columns: 1fr;
+  .speech-ring {
+    width: 195px;
+    height: 195px;
   }
 
-  .contact {
-    padding: 35px 25px;
+  .speech-ring strong {
+    font-size: 21px;
   }
 
   .about h2,
   .section-heading h2,
   .contact h2 {
-    font-size: 32px;
-  }
-
-  footer {
-    justify-content: flex-start;
-    text-align: left;
+    font-size: 31px;
   }
 }
