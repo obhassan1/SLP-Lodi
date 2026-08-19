@@ -15,9 +15,9 @@
 </a>
       <a routerLink="/payments" routerLinkActive="active">◉ <span>Payments</span>
 </a>
-      <a *ngIf="auth.user?.role==='therapist'" routerLink="/session-notes" routerLinkActive="active">✎ <span>Session notes</span>
+      <a routerLink="/session-notes" routerLinkActive="active">✎ <span>Session notes</span>
 </a>
-      <a routerLink="/users" routerLinkActive="active">⚙ <span>Users</span>
+      <a *ngIf="auth.user?.role === 'admin'" routerLink="/users" routerLinkActive="active">⚙ <span>Users</span>
 </a>
     </nav>
     <div class="quote">✦<strong>Small steps, big voices.</strong>
@@ -29,6 +29,7 @@
 <b>{{auth.user?.name}}</b>
 <small>{{auth.user?.role | titlecase}}</small>
 </div>
+      <button class="password-button" type="button" (click)="openPasswordForm()">Change password</button>
       <button class="logout-button" type="button" (click)="logout()">Log out</button>
     </div>
   </aside>
@@ -36,4 +37,37 @@
 <router-outlet>
 </router-outlet>
 </main>
+</div>
+
+<div class="password-backdrop" *ngIf="showPasswordForm">
+  <form class="password-card" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
+    <div class="password-title">
+      <h2>Change password</h2>
+      <button type="button" (click)="closePasswordForm()">×</button>
+    </div>
+
+    <label>
+      Current password
+      <input type="password" formControlName="currentPassword" autocomplete="current-password">
+    </label>
+
+    <label>
+      New password
+      <input type="password" formControlName="newPassword" autocomplete="new-password">
+      <small>At least 8 characters</small>
+    </label>
+
+    <label>
+      Confirm new password
+      <input type="password" formControlName="confirmPassword" autocomplete="new-password">
+    </label>
+
+    <p class="password-error" *ngIf="passwordError">{{ passwordError }}</p>
+    <p class="password-success" *ngIf="passwordSuccess">{{ passwordSuccess }}</p>
+
+    <div class="password-actions">
+      <button type="button" class="cancel-password" (click)="closePasswordForm()">Cancel</button>
+      <button type="submit" class="save-password" [disabled]="passwordForm.invalid">Save password</button>
+    </div>
+  </form>
 </div>

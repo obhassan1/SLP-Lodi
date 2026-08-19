@@ -41,6 +41,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true
     },
+    canManageLocation: {
+      type: Boolean,
+      default: false
+    },
+    canTreatPatients: {
+      type: Boolean,
+      default: false
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'

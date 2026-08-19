@@ -7,6 +7,20 @@
     <a class="primary" routerLink="/patients">＋ Add patient</a>
   </header>
 
+  <div class="therapist-filter" *ngIf="auth.user?.role === 'admin'">
+    <label for="dashboardTherapist">View dashboard for</label>
+    <select
+      id="dashboardTherapist"
+      [(ngModel)]="selectedTherapist"
+      (change)="loadAppointments()"
+    >
+      <option value="">All therapists</option>
+      <option *ngFor="let therapist of therapists" [value]="therapist._id">
+        {{therapist.name}}
+      </option>
+    </select>
+  </div>
+
   <div class="stats">
     <article class="hero">
       <div>
@@ -20,7 +34,7 @@
 
     <article class="panel">
       <span>Patients</span>
-      <b>{{patients.length}}</b>
+      <b>{{displayedPatients.length}}</b>
       <small>{{auth.user?.role==='admin' ? 'All active records' : 'Assigned records'}}</small>
     </article>
 
@@ -33,7 +47,7 @@
     <article class="panel" *ngIf="auth.user?.role==='admin'">
       <span>Paid revenue</span>
       <b>{{revenue | number:'1.2-2'}}</b>
-      <small>Across all therapists</small>
+      <small>{{selectedTherapist ? 'Selected therapist' : 'Across all therapists'}}</small>
     </article>
   </div>
 

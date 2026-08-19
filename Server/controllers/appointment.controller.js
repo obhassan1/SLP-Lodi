@@ -1,10 +1,14 @@
 const Appointment = require('../models/appointment.model');
 const Patient = require('../models/patient.model');
+const User = require('../models/user.model');
 exports.list = async (req, res, next) => {
     try {
         const filter = {};
         if (req.user.role !== 'admin') {
             filter.therapist = req.user.id;
+        }
+        else if (req.query.therapist) {
+            filter.therapist = req.query.therapist;
         }
         if (req.query.from || req.query.to) {
             filter.startsAt = {
@@ -42,6 +46,19 @@ exports.create = async (req, res, next) => {
             });
         }
         if (req.user.role === 'admin' && req.body.therapist) {
+            const treatingUser = await User.findOne({
+                _id: req.body.therapist,
+                active: true,
+                $or: [
+                    { role: 'therapist' },
+                    { canTreatPatients: true }
+                ]
+            });
+            if (!treatingUser) {
+                return res.status(400).json({
+                    message: 'Selected user is not enabled as a therapist'
+                });
+            }
             const assigned = patient.assignedTherapists.some(id => String(id) === String(req.body.therapist));
             if (!assigned) {
                 return res.status(400).json({
@@ -50,8 +67,12 @@ exports.create = async (req, res, next) => {
             }
             therapist = req.body.therapist;
         }
+        const location = req.user.role === 'admin' || req.user.canManageLocation
+            ? String(req.body.location || '').trim()
+            : '';
         const appointment = await Appointment.create({
             ...req.body,
+            location,
             therapist,
             createdBy: req.user.id
         });
@@ -67,18 +88,45 @@ exports.create = async (req, res, next) => {
 };
 exports.update = async (req, res, next) => {
     try {
-        if (req.user.role !== 'admin') {
-            return res.status(403).json({
-                message: 'Only an administrator can edit appointments'
-            });
-        }
         const appointment = await Appointment.findById(req.params.id);
         if (!appointment) {
             return res.status(404).json({ message: 'Appointment not found' });
         }
+        const isOwner = String(appointment.therapist) === String(req.user.id);
+        if (req.user.role !== 'admin' && !isOwner) {
+            return res.status(403).json({
+                message: 'You can only edit your own appointments'
+            });
+        }
+        if (
+            req.user.role !== 'admin' &&
+            req.body.location !== undefined &&
+            !req.user.canManageLocation
+        ) {
+            return res.status(403).json({
+                message: 'You do not have permission to change appointment locations'
+            });
+        }
 
         const patientId = req.body.patient || appointment.patient;
-        const therapistId = req.body.therapist || appointment.therapist;
+        const therapistId = req.user.role === 'admin'
+            ? (req.body.therapist || appointment.therapist)
+            : appointment.therapist;
+        if (req.user.role === 'admin' && req.body.therapist) {
+            const treatingUser = await User.findOne({
+                _id: therapistId,
+                active: true,
+                $or: [
+                    { role: 'therapist' },
+                    { canTreatPatients: true }
+                ]
+            });
+            if (!treatingUser) {
+                return res.status(400).json({
+                    message: 'Selected user is not enabled as a therapist'
+                });
+            }
+        }
         const patient = await Patient.findById(patientId);
 
         if (!patient) {
@@ -112,6 +160,22 @@ exports.update = async (req, res, next) => {
                 update[field] = req.body[field];
             }
         }
+        if (req.user.role !== 'admin') {
+            delete update.therapist;
+            if (!req.user.canManageLocation) {
+                delete update.location;
+            }
+        }
+        /*
+         * A cancelled appointment should never carry money.
+         * This covers both "cancelling now" (status included in
+         * this update) and "already cancelled" (status left as-is).
+         */
+        const resultingStatus = update.status || appointment.status;
+        if (resultingStatus === 'cancelled') {
+            update.paid = false;
+            update.amount = 0;
+        }
         const updated = await Appointment.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true })
             .populate('patient', 'name therapyFocus')
             .populate('therapist', 'name username');
@@ -123,11 +187,6 @@ exports.update = async (req, res, next) => {
 };
 exports.addSessionNote = async (req, res, next) => {
     try {
-        if (req.user.role !== 'therapist') {
-            return res.status(403).json({
-                message: 'Clinical notes are available to therapists only'
-            });
-        }
         const appointment = await Appointment.findOne({
             _id: req.params.id,
             therapist: req.user.id
@@ -188,4 +247,65 @@ exports.remove = async (req, res, next) => {
     catch (error) {
         next(error);
     }
+};
+
+exports.cancel = async (req, res, next) => {
+  try {
+    const filter = {
+      _id: req.params.id
+    };
+
+    /*
+     * Therapists can only cancel appointments
+     * assigned to their own account.
+     */
+    if (req.user.role !== 'admin') {
+      filter.therapist = req.user.id;
+    }
+
+    const appointment =
+      await Appointment.findOne(filter);
+
+    if (!appointment) {
+      return res.status(404).json({
+        message:
+          'Appointment not found or does not belong to you'
+      });
+    }
+
+    if (appointment.status === 'completed') {
+      return res.status(400).json({
+        message:
+          'A completed appointment cannot be cancelled'
+      });
+    }
+
+    if (appointment.status === 'cancelled') {
+      return res.status(400).json({
+        message:
+          'This appointment is already cancelled'
+      });
+    }
+
+    appointment.status = 'cancelled';
+    appointment.paid = false;
+    appointment.amount = 0;
+
+    await appointment.save();
+
+    await appointment.populate([
+      {
+        path: 'patient',
+        select: 'name dateOfBirth therapyFocus'
+      },
+      {
+        path: 'therapist',
+        select: 'name username'
+      }
+    ]);
+
+    res.json(appointment);
+  } catch (error) {
+    next(error);
+  }
 };

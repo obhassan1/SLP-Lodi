@@ -10,7 +10,10 @@ export class TherapistGuard implements CanActivate {
   ) {}
 
   canActivate() {
-    if (this.auth.user?.role === 'therapist') {
+    if (
+      this.auth.user?.role === 'therapist' ||
+      this.auth.user?.role === 'admin'
+    ) {
       return true;
     }
 

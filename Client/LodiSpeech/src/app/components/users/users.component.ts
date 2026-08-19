@@ -18,11 +18,13 @@ export class UsersComponent implements OnInit {
   form = this.fb.group({
     name: ['', Validators.required],
     username: ['', Validators.required],
-    email: ['', [Validators.required, Validators.email]],
-    phone: ['', Validators.required],
+    email: ['', Validators.email],
+    phone: [''],
     password: [''],
     role: ['therapist' as 'admin' | 'therapist', Validators.required],
-    active: [true]
+    active: [true],
+    canManageLocation: [false],
+    canTreatPatients: [false]
   });
 
   constructor(
@@ -61,7 +63,9 @@ export class UsersComponent implements OnInit {
       phone: '',
       password: '',
       role: 'therapist',
-      active: true
+      active: true,
+      canManageLocation: false,
+      canTreatPatients: true
     });
     this.showForm = true;
   }
@@ -81,7 +85,9 @@ export class UsersComponent implements OnInit {
       phone: user.phone || '',
       password: '',
       role: user.role,
-      active: user.active
+      active: user.active,
+      canManageLocation: !!user.canManageLocation,
+      canTreatPatients: user.role === 'therapist' || !!user.canTreatPatients
     });
     this.showForm = true;
   }
@@ -107,7 +113,12 @@ export class UsersComponent implements OnInit {
         : 'therapist' as const,
       active: this.auth.user?.role === 'admin'
         ? !!value.active
-        : true
+        : true,
+      canManageLocation: this.auth.user?.role === 'admin'
+        ? !!value.canManageLocation
+        : false,
+      canTreatPatients: value.role === 'therapist' ||
+        !!value.canTreatPatients
     };
 
     const request = this.editingUser

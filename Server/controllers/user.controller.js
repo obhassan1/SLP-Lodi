@@ -1,6 +1,6 @@
 const User = require('../models/user.model');
 
-const publicFields = 'name username email phone role active createdAt';
+const publicFields = 'name username email phone role active canManageLocation canTreatPatients createdAt';
 
 exports.list = async (_req, res, next) => {
   try {
@@ -24,17 +24,13 @@ exports.create = async (req, res, next) => {
       password
     } = req.body;
 
-    let role = req.body.role === 'admin'
+    const role = req.body.role === 'admin'
       ? 'admin'
       : 'therapist';
 
-    if (req.user.role !== 'admin') {
-      role = 'therapist';
-    }
-
-    if (!name || !username || !email || !phone || !password) {
+    if (!name || !username || !password) {
       return res.status(400).json({
-        message: 'Name, username, email, phone and password are required'
+        message: 'Name, username and password are required'
       });
     }
 
@@ -55,10 +51,12 @@ exports.create = async (req, res, next) => {
     const user = await User.create({
       name: String(name).trim(),
       username: normalizedUsername,
-      email: String(email).trim().toLowerCase(),
-      phone: String(phone).trim(),
+      email: String(email || '').trim().toLowerCase(),
+      phone: String(phone || '').trim(),
       passwordHash: await User.hashPassword(password),
       role,
+      canManageLocation: !!req.body.canManageLocation,
+      canTreatPatients: role === 'therapist' || !!req.body.canTreatPatients,
       createdBy: req.user.id
     });
 
@@ -69,7 +67,9 @@ exports.create = async (req, res, next) => {
       email: user.email,
       phone: user.phone,
       role: user.role,
-      active: user.active
+      active: user.active,
+      canManageLocation: user.canManageLocation,
+      canTreatPatients: user.role === 'therapist' || user.canTreatPatients
     });
   } catch (error) {
     next(error);
@@ -78,15 +78,6 @@ exports.create = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const isAdmin = req.user.role === 'admin';
-    const isOwnAccount = String(req.user.id) === String(req.params.id);
-
-    if (!isAdmin && !isOwnAccount) {
-      return res.status(403).json({
-        message: 'You can only edit your own account'
-      });
-    }
-
     const update = {};
     const editableFields = ['name', 'username', 'email', 'phone'];
 
@@ -104,6 +95,17 @@ exports.update = async (req, res, next) => {
         _id: { $ne: req.params.id }
       });
 
+      if (req.body.canManageLocation !== undefined) {
+  update.canManageLocation =
+    !!req.body.canManageLocation;
+}
+
+if (req.body.canTreatPatients !== undefined) {
+  update.canTreatPatients =
+    req.body.role === 'therapist' ||
+    !!req.body.canTreatPatients;
+}
+
       if (duplicate) {
         return res.status(409).json({
           message: 'Username already exists'
@@ -115,14 +117,22 @@ exports.update = async (req, res, next) => {
       update.email = update.email.toLowerCase();
     }
 
-    if (isAdmin) {
-      if (req.body.role !== undefined) {
-        update.role = req.body.role;
-      }
+    if (req.body.role !== undefined) {
+      update.role = req.body.role;
+    }
 
-      if (req.body.active !== undefined) {
-        update.active = req.body.active;
-      }
+    if (req.body.active !== undefined) {
+      update.active = req.body.active;
+    }
+
+    if (req.body.canManageLocation !== undefined) {
+      update.canManageLocation = !!req.body.canManageLocation;
+    }
+
+    if (req.body.canTreatPatients !== undefined) {
+      update.canTreatPatients = update.role === 'therapist' ||
+        req.body.role === 'therapist' ||
+        !!req.body.canTreatPatients;
     }
 
     if (req.body.password) {
@@ -151,6 +161,39 @@ exports.update = async (req, res, next) => {
     }
 
     res.json(user);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.changeOwnPassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        message: 'Current password and new password are required'
+      });
+    }
+
+    if (String(newPassword).length < 8) {
+      return res.status(400).json({
+        message: 'New password must contain at least 8 characters'
+      });
+    }
+
+    const user = await User.findById(req.user.id).select('+passwordHash');
+
+    if (!user || !(await user.comparePassword(currentPassword))) {
+      return res.status(400).json({
+        message: 'Current password is incorrect'
+      });
+    }
+
+    user.passwordHash = await User.hashPassword(newPassword);
+    await user.save();
+
+    res.json({ message: 'Password changed successfully' });
   } catch (error) {
     next(error);
   }

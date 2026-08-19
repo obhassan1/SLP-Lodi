@@ -6,6 +6,8 @@ export interface User {
     phone?: string;
     role: 'admin' | 'therapist';
     active: boolean;
+    canManageLocation?: boolean;
+    canTreatPatients?: boolean;
 }
 export interface SessionNote {
     _id?: string;

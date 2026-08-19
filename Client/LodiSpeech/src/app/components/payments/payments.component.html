@@ -5,6 +5,13 @@
 <h1>Payments</h1>
 </div>
 </header>
+<div class="therapist-filter" *ngIf="auth.user?.role === 'admin'">
+<label for="paymentTherapist">Show payments for</label>
+<select id="paymentTherapist" [(ngModel)]="selectedTherapist" (change)="load()">
+<option value="">All therapists</option>
+<option *ngFor="let therapist of therapists" [value]="therapist._id">{{therapist.name}}</option>
+</select>
+</div>
 <div class="totals">
 <article class="panel">
 <small>Total billed</small>
@@ -22,6 +29,7 @@
 <article class="panel table">
 <div class="row head">
 <b>Patient</b>
+<b>Therapist</b>
 <b>Date</b>
 <b>Amount</b>
 <b>Status</b>
@@ -29,6 +37,7 @@
 </div>
 <div class="row" *ngFor="let a of appointments">
 <b>{{name(a)}}</b>
+<span>{{therapistName(a)}}</span>
 <span>{{a.startsAt|date:'mediumDate'}}</span>
 <span>{{a.amount|number:'1.2-2'}}</span>
 <em class="status" [class.unpaid]="!a.paid">{{a.paid?'Paid':'Unpaid'}}</em>

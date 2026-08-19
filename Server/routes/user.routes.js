@@ -1,6 +1,10 @@
 const router = require('express').Router();
 const c = require('../controllers/user.controller');
-router.get('/', c.list);
-router.post('/', c.create);
-router.put('/:id', c.update);
+const { requireAdmin } = require('../middleware/auth.middleware');
+
+router.put('/me/password', c.changeOwnPassword);
+router.get('/', requireAdmin, c.list);
+router.post('/', requireAdmin, c.create);
+router.put('/:id', requireAdmin, c.update);
+
 module.exports = router;

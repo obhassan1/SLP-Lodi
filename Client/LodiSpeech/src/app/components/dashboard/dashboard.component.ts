@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Appointment, Patient } from '../../models/patient.model';
+import { Appointment, Patient, User } from '../../models/patient.model';
 import { AuthService } from '../../services/auth.service';
 import { PracticeService } from '../../services/practice.service';
+import { UserService } from '../../services/user.service';
 @Component({
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
@@ -10,9 +11,15 @@ import { PracticeService } from '../../services/practice.service';
 export class DashboardComponent implements OnInit {
     patients: Patient[] = [];
     appointments: Appointment[] = [];
+    therapists: User[] = [];
+    selectedTherapist = '';
     loading = true;
     today = new Date();
-    constructor(private practice: PracticeService, public auth: AuthService) { }
+    constructor(
+        private practice: PracticeService,
+        private usersApi: UserService,
+        public auth: AuthService
+    ) { }
     ngOnInit() {
         this.practice.getPatients().subscribe({
             next: patients => {
@@ -21,9 +28,33 @@ export class DashboardComponent implements OnInit {
             },
             error: () => this.loading = false
         });
-        this.practice.getAppointments().subscribe(appointments => {
+        this.loadAppointments();
+        if (this.auth.user?.role === 'admin') {
+            this.usersApi.list().subscribe(users => {
+                this.therapists = users.filter(user =>
+                    user.active &&
+                    (user.role === 'therapist' || !!user.canTreatPatients)
+                );
+            });
+        }
+    }
+    loadAppointments() {
+        this.practice.getAppointments(
+            undefined,
+            undefined,
+            this.selectedTherapist
+        ).subscribe(appointments => {
             this.appointments = appointments;
         });
+    }
+    get displayedPatients() {
+        if (!this.selectedTherapist) return this.patients;
+        return this.patients.filter(patient =>
+            (patient.assignedTherapists || []).some(therapist =>
+                (typeof therapist === 'string' ? therapist : therapist._id) ===
+                this.selectedTherapist
+            )
+        );
     }
     get greeting() {
         const hour = new Date().getHours();
@@ -46,7 +77,9 @@ export class DashboardComponent implements OnInit {
     }
     get revenue() {
         return this.appointments
-            .filter(appointment => appointment.paid)
+            .filter(appointment =>
+                appointment.paid && appointment.status !== 'cancelled'
+            )
             .reduce((total, appointment) => total + Number(appointment.amount || 0), 0);
     }
     patientName(appointment: Appointment) {

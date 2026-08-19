@@ -62,7 +62,7 @@
         <p class="empty" *ngIf="!appointments.length">No appointment history.</p>
       </section>
 
-      <section class="history" *ngIf="auth.user?.role==='therapist'">
+      <section class="history">
         <small>CLINICAL HISTORY</small>
         <h3>Session notes from day one</h3>
         <article class="clinical-note" *ngFor="let note of selected.notes || []">

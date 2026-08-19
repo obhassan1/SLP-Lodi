@@ -14,6 +14,43 @@
     </button>
   </header>
 
+  <div class="appointment-filters">
+    <label *ngIf="auth.user?.role === 'admin'">
+      Therapist
+    <select
+      [(ngModel)]="selectedTherapist"
+      (change)="load()"
+    >
+      <option value="">All therapists</option>
+      <option
+        *ngFor="let therapist of therapists"
+        [value]="therapist._id"
+      >
+        {{ therapist.name }}
+      </option>
+    </select>
+    </label>
+
+    <label>
+      Patient
+      <select [(ngModel)]="selectedPatient">
+        <option value="">All patients</option>
+        <option *ngFor="let patient of patients" [value]="patient._id">
+          {{patient.name}}
+        </option>
+      </select>
+    </label>
+
+    <label>
+      Day
+      <input type="date" [(ngModel)]="selectedDay">
+    </label>
+
+    <button type="button" class="clear-filters" (click)="clearFilters()">
+      Clear filters
+    </button>
+  </div>
+
   <p class="error" *ngIf="error">
     {{ error }}
   </p>
@@ -29,10 +66,10 @@
       <b>Actions</b>
     </div>
 
-    <div
-      class="appointment"
-      *ngFor="let appointment of appointments"
-    >
+    <ng-container *ngFor="let group of appointmentGroups">
+    <h2 class="day-heading">{{group.day | date:'fullDate'}}</h2>
+
+    <div class="appointment" *ngFor="let appointment of group.appointments">
       <span>{{ appointment.startsAt | date:'medium' }}</span>
       <b>{{ patientName(appointment) }}</b>
       <span>{{ therapistName(appointment) }}</span>
@@ -46,7 +83,7 @@
         {{ appointment.paid ? 'Paid' : 'Unpaid' }}
       </em>
 
-      <div class="row-actions" *ngIf="auth.user?.role === 'admin'">
+      <div class="row-actions">
         <button
           class="edit-button"
           type="button"
@@ -54,34 +91,48 @@
         >
           Edit
         </button>
-
+<button
+  *ngIf="
+    appointment.status !== 'cancelled' &&
+    appointment.status !== 'completed' &&
+    (
+      auth.user?.role === 'admin' ||
+      isOwnAppointment(appointment)
+    )
+  "
+  class="cancel-appointment-button"
+  type="button"
+  (click)="cancelAppointment(appointment)"
+>
+  Cancel
+</button>
         <button
           class="delete-button"
           type="button"
+          *ngIf="auth.user?.role === 'admin'"
           (click)="deleteAppointment(appointment)"
         >
           Delete
         </button>
-      </div>
 
-      <div class="row-actions" *ngIf="auth.user?.role === 'therapist'">
         <button
           class="note-button"
           type="button"
-          *ngIf="canAddNote(appointment)"
+          *ngIf="isOwnAppointment(appointment) && canAddNote(appointment)"
           (click)="openSessionNote(appointment)"
         >
           {{ appointment.status === 'completed' ? 'Edit note' : 'Add note' }}
         </button>
 
-        <span *ngIf="!canAddNote(appointment)">
+        <span *ngIf="isOwnAppointment(appointment) && !canAddNote(appointment)">
           Available after session
         </span>
       </div>
     </div>
+    </ng-container>
 
-    <p class="empty" *ngIf="!appointments.length">
-      No appointments yet.
+    <p class="empty" *ngIf="!filteredAppointments.length">
+      No appointments match these filters.
     </p>
   </article>
 </section>
@@ -156,7 +207,10 @@
         />
       </label>
 
-      <label class="wide">
+      <label
+        class="wide"
+        *ngIf="auth.user?.role === 'admin' || auth.user?.canManageLocation"
+      >
         Location
         <input
           type="text"

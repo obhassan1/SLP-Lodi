@@ -10,6 +10,7 @@ import { SessionNotesComponent } from './components/session-notes/session-notes.
 import { UsersComponent } from './components/users/users.component';
 import { AuthGuard } from './guards/auth.guard';
 import { TherapistGuard } from './guards/therapist.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -23,7 +24,11 @@ const routes: Routes = [
     component: SessionNotesComponent,
     canActivate: [AuthGuard, TherapistGuard]
   },
-  { path: 'users', component: UsersComponent, canActivate: [AuthGuard] },
+  {
+    path: 'users',
+    component: UsersComponent,
+    canActivate: [AuthGuard, AdminGuard]
+  },
   { path: '**', redirectTo: '' }
 ];
 

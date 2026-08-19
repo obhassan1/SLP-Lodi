@@ -2,6 +2,47 @@
   overflow-x: auto;
 }
 
+.appointment-filters {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.appointment-filters label {
+  display: grid;
+  gap: 6px;
+  color: #786c7d;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.appointment-filters select,
+.appointment-filters input {
+  min-width: 230px;
+  border: 1px solid #dbc8e4;
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: #34263b;
+}
+
+.clear-filters {
+  border: 1px solid #dbc8e4;
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: #ffffff;
+  color: #6f00a8;
+  font-weight: 700;
+}
+
+.day-heading {
+  margin: 18px 14px 7px;
+  color: #6f00a8;
+  font: 700 17px Georgia, serif;
+}
+
 .appointment {
   min-width: 1040px;
   padding: 15px;
@@ -147,4 +188,15 @@
   .appointment > * {
     padding: 2px 0;
   }
+}
+.cancel-appointment-button {
+  border: 1px solid #edcf9b;
+  background: #fff8eb;
+  color: #9a6110;
+}
+
+.cancel-appointment-button:hover {
+  border-color: #9a6110;
+  background: #9a6110;
+  color: #ffffff;
 }

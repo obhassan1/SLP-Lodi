@@ -19,13 +19,16 @@ export class AppointmentsComponent implements OnInit {
   showForm = false;
   showNoteForm = false;
   error = '';
+  selectedTherapist = '';
+  selectedPatient = '';
+  selectedDay = '';
 
   form = this.fb.group({
     patient: ['', Validators.required],
     therapist: [''],
     startsAt: ['', Validators.required],
     durationMinutes: [50, [Validators.required, Validators.min(1)]],
-    location: ['', Validators.required],
+    location: [''],
     status: ['scheduled' as Appointment['status'], Validators.required],
     amount: [0, Validators.min(0)],
     paid: [false],
@@ -45,6 +48,14 @@ export class AppointmentsComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    if (
+      this.auth.user?.role === 'admin' ||
+      this.auth.user?.canManageLocation
+    ) {
+      this.form.controls.location.addValidators(Validators.required);
+      this.form.controls.location.updateValueAndValidity();
+    }
+
     this.load();
 
     this.practice.getPatients().subscribe(patients => {
@@ -57,16 +68,59 @@ export class AppointmentsComponent implements OnInit {
 
       this.usersApi.list().subscribe(users => {
         this.therapists = users.filter(user =>
-          user.role === 'therapist' && user.active
+          user.active &&
+          (user.role === 'therapist' || !!user.canTreatPatients)
         );
       });
     }
   }
 
   load(): void {
-    this.practice.getAppointments().subscribe(appointments => {
+    this.practice.getAppointments(
+      undefined,
+      undefined,
+      this.selectedTherapist
+    ).subscribe(appointments => {
       this.appointments = appointments;
     });
+  }
+
+  get filteredAppointments(): Appointment[] {
+    return this.appointments.filter(appointment => {
+      const patientMatches = !this.selectedPatient ||
+        this.referenceId(appointment.patient) === this.selectedPatient;
+
+      const dayMatches = !this.selectedDay ||
+        this.localDay(appointment.startsAt) === this.selectedDay;
+
+      return patientMatches && dayMatches;
+    });
+  }
+
+  get appointmentGroups(): Array<{
+    day: string;
+    appointments: Appointment[];
+  }> {
+    const groups = new Map<string, Appointment[]>();
+
+    for (const appointment of this.filteredAppointments) {
+      const day = this.localDay(appointment.startsAt);
+      const existing = groups.get(day) || [];
+      existing.push(appointment);
+      groups.set(day, existing);
+    }
+
+    return Array.from(groups.entries()).map(([day, appointments]) => ({
+      day,
+      appointments
+    }));
+  }
+
+  clearFilters(): void {
+    this.selectedPatient = '';
+    this.selectedDay = '';
+    this.selectedTherapist = '';
+    this.load();
   }
 
   patientName(appointment: Appointment): string {
@@ -75,10 +129,61 @@ export class AppointmentsComponent implements OnInit {
       : appointment.patient.name;
   }
 
+
+  cancelAppointment(
+  appointment: Appointment
+): void {
+  if (
+    !appointment._id ||
+    appointment.status === 'cancelled' ||
+    appointment.status === 'completed'
+  ) {
+    return;
+  }
+
+  const allowed =
+    this.auth.user?.role === 'admin' ||
+    this.isOwnAppointment(appointment);
+
+  if (!allowed) {
+    this.error =
+      'You can only cancel your own appointments';
+
+    return;
+  }
+
+  const confirmed = confirm(
+    `Cancel the appointment for ${this.patientName(
+      appointment
+    )}?`
+  );
+
+  if (!confirmed) {
+    return;
+  }
+
+  this.practice
+    .cancelAppointment(appointment._id)
+    .subscribe({
+      next: () => {
+        this.error = '';
+        this.load();
+      },
+      error: error => {
+        this.error =
+          error.error?.message ||
+          'Could not cancel appointment';
+      }
+    });
+}
   therapistName(appointment: Appointment): string {
     return !appointment.therapist || typeof appointment.therapist === 'string'
       ? 'Not assigned'
       : appointment.therapist.name;
+  }
+
+  isOwnAppointment(appointment: Appointment): boolean {
+    return this.referenceId(appointment.therapist) === this.auth.user?._id;
   }
 
   private referenceId(value: string | Patient | User | undefined): string {
@@ -90,6 +195,14 @@ export class AppointmentsComponent implements OnInit {
     const date = new Date(value);
     const offset = date.getTimezoneOffset() * 60000;
     return new Date(date.getTime() - offset).toISOString().slice(0, 16);
+  }
+
+  private localDay(value: string): string {
+    const date = new Date(value);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   openCreate(): void {
@@ -109,8 +222,6 @@ export class AppointmentsComponent implements OnInit {
   }
 
   openEdit(appointment: Appointment): void {
-    if (this.auth.user?.role !== 'admin') return;
-
     this.error = '';
     this.editingAppointment = appointment;
     this.form.setValue({
@@ -171,11 +282,16 @@ export class AppointmentsComponent implements OnInit {
       therapist: value.therapist || undefined,
       startsAt: value.startsAt!,
       durationMinutes: Number(value.durationMinutes || 50),
-      location: value.location!,
       status: value.status!,
       paid: !!value.paid,
       amount: Number(value.amount || 0),
-      note: value.note || ''
+      note: value.note || '',
+      ...(
+        this.auth.user?.role === 'admin' ||
+        this.auth.user?.canManageLocation
+          ? { location: value.location || '' }
+          : {}
+      )
     };
 
     const request = this.editingAppointment?._id

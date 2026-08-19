@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+ 
 const appointmentSchema = new mongoose.Schema(
   {
     patient: {
@@ -54,5 +54,16 @@ const appointmentSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
-
+ 
+// Safety net: no matter which code path saves a cancelled
+// appointment, it can never carry a paid status or an amount.
+appointmentSchema.pre('save', function (next) {
+  if (this.status === 'cancelled') {
+    this.paid = false;
+    this.amount = 0;
+  }
+  next();
+});
+ 
 module.exports = mongoose.model('Appointment', appointmentSchema);
+ 

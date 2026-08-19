@@ -22,6 +22,8 @@
       <b>Phone</b>
       <b>Role</b>
       <b>Status</b>
+      <b>Location access</b>
+      <b>Treating patients</b>
       <b>Action</b>
     </div>
 
@@ -42,6 +44,14 @@
       <strong [class.inactive]="!user.active">
         {{ user.active ? 'Active' : 'Inactive' }}
       </strong>
+
+      <span>
+        {{ user.canManageLocation ? 'Allowed' : 'Not allowed' }}
+      </span>
+
+      <span>
+        {{ user.role === 'therapist' || user.canTreatPatients ? 'Yes' : 'No' }}
+      </span>
 
       <button
         *ngIf="canEdit(user)"
@@ -134,6 +144,28 @@
           formControlName="active"
         />
         <span>Active account</span>
+      </label>
+
+      <label
+        class="active-field wide"
+        *ngIf="auth.user?.role === 'admin'"
+      >
+        <input
+          type="checkbox"
+          formControlName="canManageLocation"
+        />
+        <span>Can add or edit appointment locations</span>
+      </label>
+
+      <label
+        class="active-field wide"
+        *ngIf="auth.user?.role === 'admin'"
+      >
+        <input
+          type="checkbox"
+          formControlName="canTreatPatients"
+        />
+        <span>Works as a therapist and can receive appointments</span>
       </label>
 
       <p class="wide error" *ngIf="error">

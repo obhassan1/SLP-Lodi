@@ -6,9 +6,14 @@ import { Appointment, Patient, SessionNote } from '../models/patient.model';
 export class PracticeService {
     private api = 'http://localhost:3000/api';
     constructor(private http: HttpClient) { }
-    getPatients(q = ''): Observable<Patient[]> {
+    getPatients(q = '', mine = false): Observable<Patient[]> {
+        let params = new HttpParams();
+        if (q)
+            params = params.set('q', q);
+        if (mine)
+            params = params.set('mine', 'true');
         return this.http.get<Patient[]>(`${this.api}/patients`, {
-            params: q ? new HttpParams().set('q', q) : undefined
+            params
         });
     }
     getPatient(id: string) {
@@ -31,12 +36,14 @@ export class PracticeService {
     addSessionNote(id: string, note: SessionNote) {
         return this.http.post<Patient>(`${this.api}/patients/${id}/notes`, note);
     }
-    getAppointments(from?: string, to?: string) {
+    getAppointments(from?: string, to?: string, therapist?: string) {
         let params = new HttpParams();
         if (from)
             params = params.set('from', from);
         if (to)
             params = params.set('to', to);
+        if (therapist)
+            params = params.set('therapist', therapist);
         return this.http.get<Appointment[]>(`${this.api}/appointments`, {
             params
         });
@@ -56,4 +63,13 @@ export class PracticeService {
             note
         });
     }
+
+cancelAppointment(id: string) {
+  return this.http.put<Appointment>(
+    `${this.api}/appointments/${id}`,
+    {
+      status: 'cancelled'
+    }
+  );
+}
 }

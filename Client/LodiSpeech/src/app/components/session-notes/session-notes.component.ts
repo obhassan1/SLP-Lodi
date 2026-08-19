@@ -9,7 +9,7 @@ export class SessionNotesComponent implements OnInit {
     showForm = false;
     form = this.fb.group({ sessionDate: ['', Validators.required], focus: ['', Validators.required], note: ['', Validators.required], paid: [false], amount: [0] });
     constructor(private fb: FormBuilder, private practice: PracticeService) { }
-    ngOnInit() { this.practice.getPatients().subscribe(p => { this.patients = p; this.selected = p[0]; }); }
+    ngOnInit() { this.practice.getPatients('', true).subscribe(p => { this.patients = p; this.selected = p[0]; }); }
     select(id: string) { this.selected = this.patients.find(p => p._id === id); }
     save() { if (!this.selected?._id || this.form.invalid)
         return; const v = this.form.getRawValue(); this.practice.addSessionNote(this.selected._id, { sessionDate: v.sessionDate!, focus: v.focus!, note: v.note!, paid: !!v.paid, amount: Number(v.amount || 0) }).subscribe(updated => { this.selected = updated; this.patients = this.patients.map(p => p._id === updated._id ? updated : p); this.showForm = false; this.form.reset({ paid: false, amount: 0 }); }); }

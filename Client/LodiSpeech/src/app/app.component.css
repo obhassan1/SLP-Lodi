@@ -102,6 +102,7 @@ nav a:hover {
 }
 
 
+.password-button,
 .logout-button {
   grid-column: 1 / -1;
   width: 100%;
@@ -114,11 +115,122 @@ nav a:hover {
   transition: 0.2s ease;
 }
 
+.password-button {
+  margin-top: 4px;
+}
 
+.password-button:hover,
 .logout-button:hover {
   background: #6f00a8;
   border-color: #6f00a8;
   color: #fff;
+}
+
+.password-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(31, 20, 35, 0.55);
+}
+
+.password-card {
+  width: min(430px, 100%);
+  padding: 26px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(56, 25, 70, 0.25);
+}
+
+.password-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.password-title h2 {
+  margin: 0;
+  color: #24172a;
+}
+
+.password-title button {
+  border: 0;
+  background: transparent;
+  color: #786c7d;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.password-card label {
+  display: grid;
+  gap: 7px;
+  margin-bottom: 15px;
+  color: #4b3b51;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.password-card input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #dbc8e4;
+  border-radius: 10px;
+  padding: 12px;
+  font: inherit;
+  outline: none;
+}
+
+.password-card input:focus {
+  border-color: #7b00b5;
+  box-shadow: 0 0 0 3px #f4ecfa;
+}
+
+.password-card label small {
+  color: #8a7d8f;
+  font-weight: 400;
+}
+
+.password-error,
+.password-success {
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.password-error { color: #b4233a; }
+.password-success { color: #147a55; }
+
+.password-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+.password-actions button {
+  border-radius: 10px;
+  padding: 11px 17px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cancel-password {
+  border: 1px solid #dbc8e4;
+  background: #fff;
+  color: #6f00a8;
+}
+
+.save-password {
+  border: 1px solid #7b00b5;
+  background: #7b00b5;
+  color: #fff;
+}
+
+.save-password:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 
@@ -142,7 +254,7 @@ main {
 
   .profile { grid-template-columns: 36px 1fr auto; }
 
+  .password-button,
   .logout-button { grid-column: auto; width: auto; }
 
 }
-

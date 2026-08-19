@@ -13,8 +13,20 @@ export class UserService {
         phone: string;
         password: string;
         role: 'admin' | 'therapist';
+        canManageLocation?: boolean;
+        canTreatPatients?: boolean;
     }) { return this.http.post<User>(this.api, input); }
     update(id: string, input: Partial<User> & {
         password?: string;
     }) { return this.http.put<User>(`${this.api}/${id}`, input); }
+
+    changeOwnPassword(input: {
+        currentPassword: string;
+        newPassword: string;
+    }) {
+        return this.http.put<{ message: string }>(
+            `${this.api}/me/password`,
+            input
+        );
+    }
 }

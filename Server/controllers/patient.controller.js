@@ -9,22 +9,33 @@ function hideNotesForAdmin(req, patient) {
     if (req.user.role !== 'admin')
         return patient;
     const safePatient = patient.toObject ? patient.toObject() : patient;
-    safePatient.notes = [];
+    safePatient.notes = (safePatient.notes || []).filter(note =>
+        String(note.therapist || '') === String(req.user.id)
+    );
     return safePatient;
 }
 exports.list = async (req, res, next) => {
     try {
         const filter = { ...patientScope(req) };
+        if (req.user.role === 'admin' && req.query.mine === 'true') {
+            filter.assignedTherapists = req.user.id;
+        }
         if (req.query.q) {
             filter.name = { $regex: req.query.q, $options: 'i' };
         }
         const query = Patient.find(filter)
             .populate('assignedTherapists', 'name username role')
             .sort({ name: 1 });
-        if (req.user.role === 'admin') {
+        if (req.user.role === 'admin' && req.query.mine !== 'true') {
             query.select('-notes');
         }
-        res.json(await query);
+        const patients = await query;
+        if (req.user.role === 'admin' && req.query.mine === 'true') {
+            return res.json(patients.map(patient =>
+                hideNotesForAdmin(req, patient)
+            ));
+        }
+        res.json(patients);
     }
     catch (error) {
         next(error);
@@ -111,11 +122,6 @@ exports.assign = async (req, res, next) => {
 };
 exports.addNote = async (req, res, next) => {
     try {
-        if (req.user.role !== 'therapist') {
-            return res.status(403).json({
-                message: 'Clinical notes are available to therapists only'
-            });
-        }
         const patient = await Patient.findOne({
             _id: req.params.id,
             assignedTherapists: req.user.id

@@ -9,7 +9,14 @@ exports.requireAuth = async (req, res, next) => { try {
     const user = await User.findById(payload.sub);
     if (!user || !user.active)
         return res.status(401).json({ message: 'Account is unavailable' });
-    req.user = { id: String(user._id), name: user.name, username: user.username, role: user.role };
+    req.user = {
+        id: String(user._id),
+        name: user.name,
+        username: user.username,
+        role: user.role,
+        canManageLocation: !!user.canManageLocation,
+        canTreatPatients: user.role === 'therapist' || !!user.canTreatPatients
+    };
     next();
 }
 catch (error) {

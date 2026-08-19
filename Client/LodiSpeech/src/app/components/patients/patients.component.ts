@@ -33,7 +33,10 @@ export class PatientsComponent implements OnInit {
         this.load();
         if (this.auth.user?.role === 'admin') {
             this.usersApi.list().subscribe(users => {
-                this.therapists = users.filter(user => user.role === 'therapist' && user.active);
+                this.therapists = users.filter(user =>
+                    user.active &&
+                    (user.role === 'therapist' || !!user.canTreatPatients)
+                );
             });
         }
     }
