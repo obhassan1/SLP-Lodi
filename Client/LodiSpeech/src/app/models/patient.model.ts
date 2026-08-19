@@ -2,6 +2,8 @@ export interface User {
     _id: string;
     name: string;
     username: string;
+    email?: string;
+    phone?: string;
     role: 'admin' | 'therapist';
     active: boolean;
 }
@@ -43,6 +45,7 @@ export interface Appointment {
     therapist?: string | User;
     startsAt: string;
     durationMinutes: number;
+    location?: string;
     status: 'scheduled' | 'completed' | 'cancelled';
     paid: boolean;
     amount: number;

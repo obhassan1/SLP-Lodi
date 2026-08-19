@@ -9,6 +9,8 @@ export class UserService {
     create(input: {
         name: string;
         username: string;
+        email: string;
+        phone: string;
         password: string;
         role: 'admin' | 'therapist';
     }) { return this.http.post<User>(this.api, input); }

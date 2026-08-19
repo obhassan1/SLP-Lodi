@@ -1,13 +1,107 @@
-.user{display:grid;grid-template-columns:1.3fr 1fr .7fr .7fr;gap:16px;align-items:center;padding:14px;border-top:1px solid #eee8f1}
-.user.head{border:0;background:#faf8fb;color:#786c7d;font-size:11px}
-.user>span{display:flex;align-items:center;gap:10px}
-.user i{width:37px;height:37px;display:grid;place-items:center;border-radius:50%;background:#f4ecfa;color:#6f00a8;font-style:normal;font-weight:800}
-.user code{font-size:12px}
-.user em{font-style:normal}
-.user strong{color:#287a5b}
-.user strong.inactive{color:#a94b60}
-.error{color:#a94b60;background:#fff0f3;padding:10px;border-radius:8px}
-@media(max-width:700px){.user{grid-template-columns:1fr 1fr}
-.user.head{display:none}
+.user-table {
+  overflow-x: auto;
 }
 
+.user-row {
+  min-width: 1050px;
+  padding: 14px;
+  border-top: 1px solid #eee8f1;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 1.15fr 0.85fr 0.65fr 0.65fr 0.55fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.user-row.head {
+  border: 0;
+  background: #faf8fb;
+  color: #786c7d;
+  font-size: 11px;
+}
+
+.user-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-name i {
+  width: 37px;
+  height: 37px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #f4ecfa;
+  color: #6f00a8;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.user-row code,
+.user-row span,
+.user-row em,
+.user-row strong {
+  font-size: 12px;
+}
+
+.user-row em {
+  font-style: normal;
+}
+
+.user-row strong {
+  color: #287a5b;
+}
+
+.user-row strong.inactive {
+  color: #a94b60;
+}
+
+.edit-user {
+  border: 1px solid #d9c5e3;
+  border-radius: 8px;
+  padding: 8px 11px;
+  background: #f7effa;
+  color: #6f00a8;
+  font-weight: 700;
+}
+
+.edit-user:hover {
+  background: #6f00a8;
+  color: #ffffff;
+}
+
+.active-field {
+  min-height: 47px;
+  padding: 10px 13px;
+  border: 1px solid #e5dbe8;
+  border-radius: 9px;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 10px !important;
+  cursor: pointer;
+}
+
+.active-field input {
+  width: 19px;
+  height: 19px;
+  accent-color: #6f00a8;
+}
+
+.error {
+  padding: 10px;
+  border-radius: 8px;
+  background: #fff0f3;
+  color: #a94b60;
+}
+
+@media (max-width: 700px) {
+  .user-row {
+    min-width: 0;
+    grid-template-columns: 1fr;
+  }
+
+  .user-row.head {
+    display: none;
+  }
+}

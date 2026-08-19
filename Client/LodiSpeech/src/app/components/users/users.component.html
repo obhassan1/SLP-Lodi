@@ -1,53 +1,162 @@
 <section class="page">
-<header class="page-header">
-<div>
-<small>TEAM ACCESS</small>
-<h1>Users</h1>
-</div>
-<button class="primary" (click)="showForm=true">＋ Add user</button>
-</header>
-<article class="panel">
-<div class="user head">
-<b>Name</b>
-<b>Username</b>
-<b>Role</b>
-<b>Status</b>
-</div>
-<div class="user" *ngFor="let user of users">
-<span>
-<i>{{user.name.slice(0,2)|uppercase}}</i>
-<b>{{user.name}}</b>
-</span>
-<code>{{user.username}}</code>
-<em>{{user.role|titlecase}}</em>
-<strong [class.inactive]="!user.active">{{user.active?'Active':'Inactive'}}</strong>
-</div>
-</article>
+  <header class="page-header">
+    <div>
+      <small>TEAM ACCESS</small>
+      <h1>Users</h1>
+    </div>
+
+    <button
+      class="primary"
+      type="button"
+      (click)="openCreate()"
+    >
+      ＋ Add user
+    </button>
+  </header>
+
+  <article class="panel user-table">
+    <div class="user-row head">
+      <b>Name</b>
+      <b>Username</b>
+      <b>Email</b>
+      <b>Phone</b>
+      <b>Role</b>
+      <b>Status</b>
+      <b>Action</b>
+    </div>
+
+    <div
+      class="user-row"
+      *ngFor="let user of users"
+    >
+      <span class="user-name">
+        <i>{{ user.name.slice(0, 2) | uppercase }}</i>
+        <b>{{ user.name }}</b>
+      </span>
+
+      <code>{{ user.username }}</code>
+      <span>{{ user.email || 'Not entered' }}</span>
+      <span>{{ user.phone || 'Not entered' }}</span>
+      <em>{{ user.role | titlecase }}</em>
+
+      <strong [class.inactive]="!user.active">
+        {{ user.active ? 'Active' : 'Inactive' }}
+      </strong>
+
+      <button
+        *ngIf="canEdit(user)"
+        class="edit-user"
+        type="button"
+        (click)="openEdit(user)"
+      >
+        Edit
+      </button>
+    </div>
+  </article>
 </section>
+
 <div class="backdrop" *ngIf="showForm">
-<form class="form-card" [formGroup]="form" (ngSubmit)="save()">
-<div class="form-title">
-<h2>Add user</h2>
-<button class="close" type="button" (click)="showForm=false">×</button>
-</div>
-<div class="form-grid">
-<label>Full name<input formControlName="name">
-</label>
-<label>Username<input formControlName="username" autocomplete="off">
-</label>
-<label>Password<input type="password" formControlName="password" autocomplete="new-password">
-<small>At least 8 characters</small>
-</label>
-<label *ngIf="auth.user?.role==='admin'">Role<select formControlName="role">
-<option value="therapist">Therapist</option>
-<option value="admin">Administrator</option>
-</select>
-</label>
-<p class="wide error" *ngIf="error">{{error}}</p>
-</div>
-<div class="form-actions">
-<button class="cancel" type="button" (click)="showForm=false">Cancel</button>
-<button class="primary" type="submit" [disabled]="form.invalid">Create user</button>
-</div>
-</form>
+  <form
+    class="form-card"
+    [formGroup]="form"
+    (ngSubmit)="save()"
+  >
+    <div class="form-title">
+      <h2>{{ editingUser ? 'Edit user' : 'Add user' }}</h2>
+
+      <button
+        class="close"
+        type="button"
+        (click)="closeForm()"
+      >
+        ×
+      </button>
+    </div>
+
+    <div class="form-grid">
+      <label>
+        Full name
+        <input formControlName="name" />
+      </label>
+
+      <label>
+        Username
+        <input
+          formControlName="username"
+          autocomplete="off"
+        />
+      </label>
+
+      <label>
+        Email
+        <input
+          type="email"
+          formControlName="email"
+        />
+      </label>
+
+      <label>
+        Phone number
+        <input
+          type="tel"
+          formControlName="phone"
+          placeholder="+961 76 783 399"
+        />
+      </label>
+
+      <label class="wide">
+        {{ editingUser ? 'New password (optional)' : 'Password' }}
+
+        <input
+          type="password"
+          formControlName="password"
+          autocomplete="new-password"
+        />
+
+        <small>At least 8 characters</small>
+      </label>
+
+      <label *ngIf="auth.user?.role === 'admin'">
+        Role
+
+        <select formControlName="role">
+          <option value="therapist">Therapist</option>
+          <option value="admin">Administrator</option>
+        </select>
+      </label>
+
+      <label
+        class="active-field"
+        *ngIf="auth.user?.role === 'admin'"
+      >
+        <input
+          type="checkbox"
+          formControlName="active"
+        />
+        <span>Active account</span>
+      </label>
+
+      <p class="wide error" *ngIf="error">
+        {{ error }}
+      </p>
+    </div>
+
+    <div class="form-actions">
+      <button
+        class="cancel"
+        type="button"
+        (click)="closeForm()"
+      >
+        Cancel
+      </button>
+
+      <button
+        class="primary"
+        type="submit"
+        [disabled]="form.invalid"
+      >
+        {{ editingUser ? 'Save changes' : 'Create user' }}
+      </button>
+    </div>
+  </form>
 </div>

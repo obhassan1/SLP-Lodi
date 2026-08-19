@@ -47,6 +47,9 @@ export class PracticeService {
     updateAppointment(id: string, item: Partial<Appointment>) {
         return this.http.put<Appointment>(`${this.api}/appointments/${id}`, item);
     }
+    deleteAppointment(id: string) {
+        return this.http.delete<void>(`${this.api}/appointments/${id}`);
+    }
     addAppointmentNote(id: string, focus: string, note: string) {
         return this.http.post(`${this.api}/appointments/${id}/session-note`, {
             focus,

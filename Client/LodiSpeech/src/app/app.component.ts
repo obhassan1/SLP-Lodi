@@ -1,8 +1,13 @@
-import { Component } from '@angular/core';
+import {
+  Component,
+  HostListener
+} from '@angular/core';
+
 import {
   NavigationEnd,
   Router
 } from '@angular/router';
+
 import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
 
@@ -18,27 +23,48 @@ export class AppComponent {
     private router: Router,
     public auth: AuthService
   ) {
-    this.updateLayout(this.router.url);
+    this.updateLayout();
 
     this.router.events
       .pipe(
         filter(
-          event => event instanceof NavigationEnd
+          event =>
+            event instanceof NavigationEnd
         )
       )
-      .subscribe(event => {
-        const navigation = event as NavigationEnd;
-        this.updateLayout(navigation.urlAfterRedirects);
+      .subscribe(() => {
+        this.updateLayout();
       });
   }
 
-  private updateLayout(url: string): void {
-    const pathWithoutQuery = url.split('?')[0];
-    const pathWithoutFragment =
-      pathWithoutQuery.split('#')[0];
+  @HostListener('window:hashchange')
+  onHashChange(): void {
+    this.updateLayout();
+  }
+
+  @HostListener('window:popstate')
+  onPopState(): void {
+    this.updateLayout();
+  }
+
+  private updateLayout(): void {
+    /*
+     * pathname excludes #home, #about,
+     * #services and #contact automatically.
+     */
+    const path = window.location.pathname
+      .replace(/\/+$/, '') || '/';
 
     this.publicPage =
-      pathWithoutFragment === '/' ||
-      pathWithoutFragment === '/staff-login';
+      path === '/' ||
+      path === '/staff-login';
+  }
+
+  logout(): void {
+    this.auth.logout();
+
+    this.router.navigate([
+      '/staff-login'
+    ]);
   }
 }

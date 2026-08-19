@@ -67,19 +67,40 @@ exports.create = async (req, res, next) => {
 };
 exports.update = async (req, res, next) => {
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({
+                message: 'Only an administrator can edit appointments'
+            });
+        }
         const appointment = await Appointment.findById(req.params.id);
         if (!appointment) {
             return res.status(404).json({ message: 'Appointment not found' });
         }
-        if (req.user.role !== 'admin' &&
-            String(appointment.therapist) !== String(req.user.id)) {
-            return res.status(403).json({
-                message: 'You do not have access to this appointment'
+
+        const patientId = req.body.patient || appointment.patient;
+        const therapistId = req.body.therapist || appointment.therapist;
+        const patient = await Patient.findById(patientId);
+
+        if (!patient) {
+            return res.status(404).json({ message: 'Patient not found' });
+        }
+
+        const therapistAssigned = patient.assignedTherapists.some(id =>
+            String(id) === String(therapistId)
+        );
+
+        if (!therapistAssigned) {
+            return res.status(400).json({
+                message: 'Selected therapist is not assigned to this patient'
             });
         }
+
         const allowedFields = [
+            'patient',
+            'therapist',
             'startsAt',
             'durationMinutes',
+            'location',
             'status',
             'paid',
             'amount',
@@ -152,15 +173,14 @@ exports.addSessionNote = async (req, res, next) => {
 };
 exports.remove = async (req, res, next) => {
     try {
+        if (req.user.role !== 'admin') {
+            return res.status(403).json({
+                message: 'Only an administrator can delete appointments'
+            });
+        }
         const appointment = await Appointment.findById(req.params.id);
         if (!appointment) {
             return res.status(404).json({ message: 'Appointment not found' });
-        }
-        if (req.user.role !== 'admin' &&
-            String(appointment.therapist) !== String(req.user.id)) {
-            return res.status(403).json({
-                message: 'You do not have access to this appointment'
-            });
         }
         await appointment.deleteOne();
         res.status(204).end();

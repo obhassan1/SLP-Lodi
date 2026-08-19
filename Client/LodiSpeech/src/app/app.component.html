@@ -1,70 +1,39 @@
-<router-outlet *ngIf="publicPage"></router-outlet>
+<router-outlet *ngIf="publicPage">
+</router-outlet>
 
-<div
-  class="shell"
-  *ngIf="!publicPage"
->
+<div class="shell" *ngIf="!publicPage">
   <aside>
-    <div class="logo">
-      <img
-        src="assets/lodi-logo.jpeg"
-        alt="Lodi Thebian logo"
-      />
-    </div>
-
+    <a class="logo-link" routerLink="/">
+<img src="assets/lodi-logo.jpeg" alt="Lodi Thebian logo">
+</a>
     <nav>
-      <a
-        routerLink="/dashboard"
-        routerLinkActive="active"
-      >
-        ⌂
-        <span>Overview</span>
-      </a>
-
-      <a
-        routerLink="/patients"
-        routerLinkActive="active"
-      >
-        ♙
-        <span>Patients</span>
-      </a>
-
-      <a
-        routerLink="/appointments"
-        routerLinkActive="active"
-      >
-        ▣
-        <span>Appointments</span>
-      </a>
-
-      <a
-        routerLink="/payments"
-        routerLinkActive="active"
-      >
-        ◉
-        <span>Payments</span>
-      </a>
-
-      <a
-        *ngIf="auth.user?.role === 'therapist'"
-        routerLink="/session-notes"
-        routerLinkActive="active"
-      >
-        ✎
-        <span>Session notes</span>
-      </a>
-
-      <a
-        routerLink="/users"
-        routerLinkActive="active"
-      >
-        ⚙
-        <span>Users</span>
-      </a>
+      <a routerLink="/dashboard" routerLinkActive="active">⌂ <span>Overview</span>
+</a>
+      <a routerLink="/patients" routerLinkActive="active">♙ <span>Patients</span>
+</a>
+      <a routerLink="/appointments" routerLinkActive="active">▣ <span>Appointments</span>
+</a>
+      <a routerLink="/payments" routerLinkActive="active">◉ <span>Payments</span>
+</a>
+      <a *ngIf="auth.user?.role==='therapist'" routerLink="/session-notes" routerLinkActive="active">✎ <span>Session notes</span>
+</a>
+      <a routerLink="/users" routerLinkActive="active">⚙ <span>Users</span>
+</a>
     </nav>
+    <div class="quote">✦<strong>Small steps, big voices.</strong>
+<p>Keep each patient journey organized in one calm place.</p>
+</div>
+    <div class="profile">
+      <i>{{auth.user?.name?.slice(0,2) | uppercase}}</i>
+      <div>
+<b>{{auth.user?.name}}</b>
+<small>{{auth.user?.role | titlecase}}</small>
+</div>
+      <button class="logout-button" type="button" (click)="logout()">Log out</button>
+    </div>
   </aside>
-
   <main>
-    <router-outlet></router-outlet>
-  </main>
+<router-outlet>
+</router-outlet>
+</main>
 </div>

@@ -16,6 +16,10 @@ export class AuthService {
     get token() { return localStorage.getItem('lodi_token'); }
     get user() { return this.userSubject.value; }
     get isLoggedIn() { return !!this.token && !!this.user; }
+    updateCurrentUser(user: User) {
+        localStorage.setItem('lodi_user', JSON.stringify(user));
+        this.userSubject.next(user);
+    }
     private readUser() { try {
         return JSON.parse(localStorage.getItem('lodi_user') || 'null') as User | null;
     }
