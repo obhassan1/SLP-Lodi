@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
-import { NavigationEnd, Router } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { UserService } from './services/user.service';
 
@@ -11,7 +10,6 @@ import { UserService } from './services/user.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  publicPage = true;
   showPasswordForm = false;
   passwordError = '';
   passwordSuccess = '';
@@ -23,17 +21,20 @@ export class AppComponent {
   });
 
   constructor(
-    private router: Router,
+    public router: Router,
     private fb: FormBuilder,
     private usersApi: UserService,
     public auth: AuthService
-  ) {
-    this.router.events
-      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
-      .subscribe((event) => {
-        const url = event.urlAfterRedirects.split('?')[0];
-        this.publicPage = url === '/' || url === '/staff-login';
-      });
+  ) {}
+
+  /**
+   * Keep public pages independent from NavigationEnd timing.
+   * This also handles query strings and an accidental trailing slash.
+   */
+  get publicPage(): boolean {
+    const url = (this.router.url || '/').split('?')[0].split('#')[0];
+    const normalized = url.length > 1 ? url.replace(/\/+$/, '') : url;
+    return normalized === '/' || normalized === '/staff-login';
   }
 
   openPasswordForm(): void {
