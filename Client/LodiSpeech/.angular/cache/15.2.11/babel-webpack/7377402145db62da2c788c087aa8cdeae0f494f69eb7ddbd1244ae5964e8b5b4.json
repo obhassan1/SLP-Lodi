@@ -1,0 +1,1 @@
+{"ast":null,"code":"/**\r\n * Single place to change the backend API URL.\r\n * Before deploying, update apiUrl to your Render backend\r\n * (or custom domain, e.g. https://api.yourdomain.com/api).\r\n */\nexport const environment = {\n  apiUrl: 'https://slp-lodi.onrender.com/api/v1'\n};","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

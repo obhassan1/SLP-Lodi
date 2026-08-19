@@ -4,6 +4,6 @@
  * (or custom domain, e.g. https://api.yourdomain.com/api).
  */
 export const environment = {
-  apiUrl: 'https://slp-lodi.onrender.com/api'
+  apiUrl: 'https://slp-lodi.onrender.com/api/v1'
 };
  
