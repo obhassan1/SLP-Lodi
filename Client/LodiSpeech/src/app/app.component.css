@@ -1,9 +1,8 @@
 .shell {
   display: grid;
-  grid-template-columns: 240px 1fr;
+  grid-template-columns: 240px minmax(0, 1fr);
   min-height: 100vh;
 }
-
 
 aside {
   position: sticky;
@@ -14,8 +13,12 @@ aside {
   padding: 25px 18px;
   display: flex;
   flex-direction: column;
+  z-index: 30;
 }
 
+.logo-link {
+  display: block;
+}
 
 aside img {
   width: 175px;
@@ -23,13 +26,11 @@ aside img {
   object-fit: contain;
 }
 
-
 nav {
   display: grid;
   gap: 7px;
   margin-top: 25px;
 }
-
 
 nav a {
   text-decoration: none;
@@ -38,16 +39,15 @@ nav a {
   border-radius: 12px;
   font-weight: 600;
   display: flex;
+  align-items: center;
   gap: 12px;
 }
-
 
 nav a.active,
 nav a:hover {
   background: #f4ecfa;
   color: #6f00a8;
 }
-
 
 .quote {
   margin-top: auto;
@@ -57,7 +57,6 @@ nav a:hover {
   color: #6f00a8;
 }
 
-
 .quote strong,
 .quote p,
 .profile small,
@@ -65,12 +64,10 @@ nav a:hover {
   display: block;
 }
 
-
 .quote p {
   font-size: 11px;
   color: #786c7d;
 }
-
 
 .profile {
   display: grid;
@@ -81,7 +78,6 @@ nav a:hover {
   border-top: 1px solid #eee8f1;
   padding-top: 16px;
 }
-
 
 .profile i {
   width: 36px;
@@ -95,12 +91,10 @@ nav a:hover {
   font-weight: 700;
 }
 
-
 .profile small {
   color: #786c7d;
   font-size: 10px;
 }
-
 
 .password-button,
 .logout-button {
@@ -112,7 +106,7 @@ nav a:hover {
   border-radius: 10px;
   padding: 9px 12px;
   font-weight: 700;
-  transition: 0.2s ease;
+  transition: .2s ease;
 }
 
 .password-button {
@@ -126,6 +120,10 @@ nav a:hover {
   color: #fff;
 }
 
+/* =====================================================
+   PASSWORD MODAL
+===================================================== */
+
 .password-backdrop {
   position: fixed;
   inset: 0;
@@ -133,7 +131,7 @@ nav a:hover {
   display: grid;
   place-items: center;
   padding: 20px;
-  background: rgba(31, 20, 35, 0.55);
+  background: rgba(31, 20, 35, .55);
 }
 
 .password-card {
@@ -141,7 +139,7 @@ nav a:hover {
   padding: 26px;
   border-radius: 20px;
   background: #fff;
-  box-shadow: 0 24px 70px rgba(56, 25, 70, 0.25);
+  box-shadow: 0 24px 70px rgba(56, 25, 70, .25);
 }
 
 .password-title {
@@ -199,8 +197,13 @@ nav a:hover {
   font-size: 13px;
 }
 
-.password-error { color: #b4233a; }
-.password-success { color: #147a55; }
+.password-error {
+  color: #b4233a;
+}
+
+.password-success {
+  color: #147a55;
+}
 
 .password-actions {
   display: flex;
@@ -230,31 +233,133 @@ nav a:hover {
 
 .save-password:disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+  opacity: .5;
 }
-
 
 main {
   min-width: 0;
 }
 
+/* =====================================================
+   PHONE APP
+===================================================== */
 
 @media (max-width: 760px) {
-  .shell { grid-template-columns: 1fr; }
 
-  aside { height: auto; position: static; padding: 13px; }
+  .shell {
+    display: block;
+    min-height: 100vh;
+    padding-bottom: 76px;
+  }
 
-  aside img { height: 55px; }
+  /*
+    Sidebar becomes the mobile bottom navigation.
+  */
+  aside {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
 
-  nav { display: flex; overflow-x: auto; margin-top: 8px; }
+    width: 100%;
+    height: 68px;
 
-  nav a { white-space: nowrap; padding: 9px 11px; font-size: 12px; }
+    padding: 7px 8px max(7px, env(safe-area-inset-bottom));
 
-  .quote { display: none; }
+    border-right: 0;
+    border-top: 1px solid #eee8f1;
 
-  .profile { grid-template-columns: 36px 1fr auto; }
+    background: rgba(255, 255, 255, .98);
+    backdrop-filter: blur(16px);
 
-  .password-button,
-  .logout-button { grid-column: auto; width: auto; }
+    display: block;
 
+    box-shadow: 0 -8px 30px rgba(48, 20, 58, .08);
+    z-index: 500;
+  }
+
+  .logo-link,
+  .quote,
+  .profile {
+    display: none;
+  }
+
+  nav {
+    width: 100%;
+    height: 100%;
+
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+
+    gap: 2px;
+    overflow: visible;
+  }
+
+  nav a {
+    min-width: 0;
+    height: 54px;
+
+    padding: 4px 2px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    gap: 2px;
+
+    border-radius: 12px;
+
+    font-size: 19px;
+    line-height: 1;
+    text-align: center;
+  }
+
+  nav a span {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  nav a.active {
+    color: #6f00a8;
+    background: #f4ecfa;
+  }
+
+  main {
+    width: 100%;
+    min-height: calc(100vh - 68px);
+  }
+
+  .password-backdrop {
+    align-items: end;
+    padding: 0;
+  }
+
+  .password-card {
+    width: 100%;
+    border-radius: 24px 24px 0 0;
+    padding: 24px 20px;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 430px) {
+
+  nav a {
+    font-size: 18px;
+  }
+
+  nav a span {
+    font-size: 8px;
+  }
 }
