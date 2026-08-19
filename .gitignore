@@ -1,0 +1,23 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Angular
+dist/
+**/dist/
+.angular/
+**/.angular/
+
+# Environment files
+.env
+**/.env
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
