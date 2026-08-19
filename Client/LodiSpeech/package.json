@@ -2,9 +2,12 @@
   "name": "lodi-speech-client",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
-    "start": "ng serve",
-    "build": "ng build"
+"scripts": {
+    "ng": "node ./node_modules/@angular/cli/bin/ng",
+    "start": "node ./node_modules/@angular/cli/bin/ng serve",
+    "build": "node ./node_modules/@angular/cli/bin/ng build",
+    "watch": "node ./node_modules/@angular/cli/bin/ng build --watch --configuration development",
+    "test": "node ./node_modules/@angular/cli/bin/ng test"
   },
   "dependencies": {
     "@angular/animations": "^15.2.0",
