@@ -1,44 +1,39 @@
-<router-outlet *ngIf="publicPage">
-</router-outlet>
-
-<div class="shell" *ngIf="!publicPage">
-  <aside>
+<div [class.shell]="!publicPage">
+  <!-- Sidebar only renders on non-public pages -->
+  <aside *ngIf="!publicPage">
     <a class="logo-link" routerLink="/">
-<img src="assets/lodi-logo.jpeg" alt="Lodi Thebian logo">
-</a>
+      <img src="assets/lodi-logo.jpeg" alt="Lodi Thebian logo">
+    </a>
     <nav>
-      <a routerLink="/dashboard" routerLinkActive="active">⌂ <span>Overview</span>
-</a>
-      <a routerLink="/patients" routerLinkActive="active">♙ <span>Patients</span>
-</a>
-      <a routerLink="/appointments" routerLinkActive="active">▣ <span>Appointments</span>
-</a>
-      <a routerLink="/payments" routerLinkActive="active">◉ <span>Payments</span>
-</a>
-      <a routerLink="/session-notes" routerLinkActive="active">✎ <span>Session notes</span>
-</a>
-      <a *ngIf="auth.user?.role === 'admin'" routerLink="/users" routerLinkActive="active">⚙ <span>Users</span>
-</a>
+      <a routerLink="/dashboard" routerLinkActive="active">⌂ <span>Overview</span></a>
+      <a routerLink="/patients" routerLinkActive="active">♙ <span>Patients</span></a>
+      <a routerLink="/appointments" routerLinkActive="active">▣ <span>Appointments</span></a>
+      <a routerLink="/payments" routerLinkActive="active">◉ <span>Payments</span></a>
+      <a routerLink="/session-notes" routerLinkActive="active">✎ <span>Session notes</span></a>
+      <a *ngIf="auth.user?.role === 'admin'" routerLink="/users" routerLinkActive="active">⚙ <span>Users</span></a>
     </nav>
-    <div class="quote">✦<strong>Small steps, big voices.</strong>
-<p>Keep each patient journey organized in one calm place.</p>
-</div>
+    <div class="quote">
+      ✦<strong>Small steps, big voices.</strong>
+      <p>Keep each patient journey organized in one calm place.</p>
+    </div>
     <div class="profile">
       <i>{{auth.user?.name?.slice(0,2) | uppercase}}</i>
       <div>
-<b>{{auth.user?.name}}</b>
-<small>{{auth.user?.role | titlecase}}</small>
-</div>
+        <b>{{auth.user?.name}}</b>
+        <small>{{auth.user?.role | titlecase}}</small>
+      </div>
       <button class="password-button" type="button" (click)="openPasswordForm()">Change password</button>
       <button class="logout-button" type="button" (click)="logout()">Log out</button>
     </div>
   </aside>
-  <main>
-<router-outlet>
-</router-outlet>
-</main>
+
+  <!-- Single persistent router outlet for ALL pages -->
+  <main [class.public-main]="publicPage">
+    <router-outlet></router-outlet>
+  </main>
 </div>
 
+<!-- Password Modal -->
 <div class="password-backdrop" *ngIf="showPasswordForm">
   <form class="password-card" [formGroup]="passwordForm" (ngSubmit)="changePassword()">
     <div class="password-title">

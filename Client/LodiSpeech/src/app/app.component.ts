@@ -1,4 +1,4 @@
-import { Component, HostListener } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormBuilder, Validators } from '@angular/forms';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -28,26 +28,12 @@ export class AppComponent {
     private usersApi: UserService,
     public auth: AuthService
   ) {
-    this.updateLayout();
-
     this.router.events
-      .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe(() => this.updateLayout());
-  }
-
-  @HostListener('window:hashchange')
-  onHashChange(): void {
-    this.updateLayout();
-  }
-
-  @HostListener('window:popstate')
-  onPopState(): void {
-    this.updateLayout();
-  }
-
-  private updateLayout(): void {
-    const path = window.location.pathname.replace(/\/+$/, '') || '/';
-    this.publicPage = path === '/' || path === '/staff-login';
+      .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
+      .subscribe((event) => {
+        const url = event.urlAfterRedirects.split('?')[0];
+        this.publicPage = url === '/' || url === '/staff-login';
+      });
   }
 
   openPasswordForm(): void {
