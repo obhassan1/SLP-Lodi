@@ -3,6 +3,7 @@
   <header class="statistics-header">
 
     <div>
+
       <small>
         ADMINISTRATION
       </small>
@@ -15,6 +16,7 @@
         Appointments, revenue, payments
         and therapist performance.
       </p>
+
     </div>
 
   </header>
@@ -27,12 +29,16 @@
   <section class="statistics-filters">
 
     <label>
-      Period
+
+      <span>
+        Period
+      </span>
 
       <select
         [(ngModel)]="period"
         (change)="changePeriod()"
       >
+
         <option value="thisMonth">
           This month
         </option>
@@ -56,17 +62,23 @@
         <option value="custom">
           Custom
         </option>
+
       </select>
+
     </label>
 
 
     <label>
-      Therapist
+
+      <span>
+        Therapist
+      </span>
 
       <select
         [(ngModel)]="selectedTherapist"
         (change)="load()"
       >
+
         <option value="">
           All therapists
         </option>
@@ -80,7 +92,9 @@
         >
           {{ therapist.name }}
         </option>
+
       </select>
+
     </label>
 
 
@@ -89,23 +103,34 @@
         period === 'custom'
       "
     >
+
       <label>
-        From
+
+        <span>
+          From
+        </span>
 
         <input
           type="date"
           [(ngModel)]="customFrom"
         >
+
       </label>
 
+
       <label>
-        To
+
+        <span>
+          To
+        </span>
 
         <input
           type="date"
           [(ngModel)]="customTo"
         >
+
       </label>
+
 
       <button
         type="button"
@@ -114,24 +139,34 @@
       >
         Apply
       </button>
+
     </ng-container>
 
   </section>
 
 
-  <p
-    class="loading"
+  <!-- ===================================== -->
+  <!-- LOADING                               -->
+  <!-- ===================================== -->
+
+  <div
+    class="message loading"
     *ngIf="loading"
   >
     Loading statistics...
-  </p>
+  </div>
 
-  <p
-    class="error"
+
+  <!-- ===================================== -->
+  <!-- ERROR                                 -->
+  <!-- ===================================== -->
+
+  <div
+    class="message error"
     *ngIf="error"
   >
     {{ error }}
-  </p>
+  </div>
 
 
   <ng-container
@@ -141,24 +176,28 @@
     "
   >
 
+
     <!-- ===================================== -->
-    <!-- MAIN KPI CARDS                        -->
+    <!-- SUMMARY                              -->
     <!-- ===================================== -->
 
     <section class="summary-grid">
 
+
       <article class="summary-card revenue-card">
+
         <div class="summary-icon">
           $
         </div>
 
-        <div>
+        <div class="summary-content">
+
           <span>
             Paid revenue
           </span>
 
           <strong>
-            {{ money(
+            ${{ money(
               data.summary.revenue
             ) }}
           </strong>
@@ -170,16 +209,20 @@
             }}
             paid sessions
           </small>
+
         </div>
+
       </article>
 
 
       <article class="summary-card">
+
         <div class="summary-icon">
           ◫
         </div>
 
-        <div>
+        <div class="summary-content">
+
           <span>
             Appointments
           </span>
@@ -194,16 +237,20 @@
           <small>
             Selected period
           </small>
+
         </div>
+
       </article>
 
 
-      <article class="summary-card">
+      <article class="summary-card completed-card">
+
         <div class="summary-icon">
           ✓
         </div>
 
-        <div>
+        <div class="summary-content">
+
           <span>
             Completed
           </span>
@@ -224,16 +271,20 @@
             }}
             completion rate
           </small>
+
         </div>
+
       </article>
 
 
       <article class="summary-card cancellation-card">
+
         <div class="summary-icon">
           ×
         </div>
 
-        <div>
+        <div class="summary-content">
+
           <span>
             Cancelled
           </span>
@@ -254,16 +305,20 @@
             }}
             cancellation rate
           </small>
+
         </div>
+
       </article>
 
 
-      <article class="summary-card">
+      <article class="summary-card unpaid-card">
+
         <div class="summary-icon">
           !
         </div>
 
-        <div>
+        <div class="summary-content">
+
           <span>
             Unpaid sessions
           </span>
@@ -276,50 +331,54 @@
           </strong>
 
           <small>
-            {{
-              money(
-                data.summary
-                  .unpaidAmount
-              )
-            }}
+            ${{ money(
+              data.summary
+                .unpaidAmount
+            ) }}
             outstanding
           </small>
+
         </div>
+
       </article>
 
 
       <article class="summary-card">
+
         <div class="summary-icon">
           Ø
         </div>
 
-        <div>
+        <div class="summary-content">
+
           <span>
             Average paid session
           </span>
 
           <strong>
-            {{
-              money(
-                data.summary
-                  .averageSessionRevenue
-              )
-            }}
+            ${{ money(
+              data.summary
+                .averageSessionRevenue
+            ) }}
           </strong>
 
           <small>
             Average revenue
           </small>
+
         </div>
+
       </article>
 
 
       <article class="summary-card">
+
         <div class="summary-icon">
           ♙
         </div>
 
-        <div>
+        <div class="summary-content">
+
           <span>
             Active patients
           </span>
@@ -338,16 +397,20 @@
                 : 'Across clinic'
             }}
           </small>
+
         </div>
+
       </article>
 
 
       <article class="summary-card">
+
         <div class="summary-icon">
           +
         </div>
 
-        <div>
+        <div class="summary-content">
+
           <span>
             Scheduled
           </span>
@@ -362,571 +425,262 @@
           <small>
             Upcoming / pending
           </small>
+
         </div>
+
       </article>
 
     </section>
 
 
     <!-- ===================================== -->
-    <!-- MONTHLY CHARTS                        -->
+    <!-- CHARTS TITLE                          -->
+    <!-- ===================================== -->
+
+    <div class="section-title">
+
+      <div>
+
+        <small>
+          ANALYTICS
+        </small>
+
+        <h2>
+          Clinic performance
+        </h2>
+
+        <p>
+          Visual overview of revenue,
+          appointments and workload.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================== -->
+    <!-- CHARTS                                -->
     <!-- ===================================== -->
 
     <section class="charts-grid">
 
+
+      <!-- REVENUE -->
+
       <article class="chart-card">
 
         <div class="chart-title">
+
           <div>
+
             <small>
               MONEY
             </small>
 
             <h2>
-              Revenue trend
+              Revenue by month
             </h2>
+
+            <p>
+              Paid appointment revenue
+              during the selected period.
+            </p>
+
           </div>
+
         </div>
 
 
-        <div
-          class="empty-chart"
-          *ngIf="
-            !data.monthlyTrend.length
-          "
-        >
-          No data for this period.
-        </div>
+        <div class="real-chart-container">
 
-
-        <div
-          class="column-chart"
-          *ngIf="
-            data.monthlyTrend.length
-          "
-        >
-
-          <div
-            class="column-item"
-            *ngFor="
-              let month
-              of data.monthlyTrend
-            "
+          <canvas
+            baseChart
+            [data]="revenueChartData"
+            [options]="lineChartOptions"
+            [type]="'line'"
           >
-
-            <div class="column-value">
-              {{ money(
-                month.revenue
-              ) }}
-            </div>
-
-            <div class="column-track">
-
-              <div
-                class="column revenue-column"
-                [style.height.%]="
-                  revenueHeight(
-                    month.revenue
-                  )
-                "
-              >
-              </div>
-
-            </div>
-
-            <div class="column-label">
-              {{ month.label }}
-            </div>
-
-          </div>
+          </canvas>
 
         </div>
 
       </article>
 
 
-      <article class="chart-card">
-
-        <div class="chart-title">
-          <div>
-            <small>
-              ACTIVITY
-            </small>
-
-            <h2>
-              Appointment trend
-            </h2>
-          </div>
-        </div>
-
-
-        <div
-          class="empty-chart"
-          *ngIf="
-            !data.monthlyTrend.length
-          "
-        >
-          No data for this period.
-        </div>
-
-
-        <div
-          class="column-chart"
-          *ngIf="
-            data.monthlyTrend.length
-          "
-        >
-
-          <div
-            class="column-item"
-            *ngFor="
-              let month
-              of data.monthlyTrend
-            "
-          >
-
-            <div class="column-value">
-              {{ month.appointments }}
-            </div>
-
-            <div class="column-track">
-
-              <div
-                class="column appointment-column"
-                [style.height.%]="
-                  appointmentHeight(
-                    month.appointments
-                  )
-                "
-              >
-              </div>
-
-            </div>
-
-            <div class="column-label">
-              {{ month.label }}
-            </div>
-
-          </div>
-
-        </div>
-
-      </article>
-
-    </section>
-
-
-    <!-- ===================================== -->
-    <!-- STATUS & PAYMENTS                     -->
-    <!-- ===================================== -->
-
-    <section class="charts-grid">
+      <!-- APPOINTMENTS -->
 
       <article class="chart-card">
 
         <div class="chart-title">
+
           <div>
+
             <small>
               APPOINTMENTS
             </small>
 
             <h2>
-              Appointment status
+              Appointment activity
             </h2>
+
+            <p>
+              Total, completed and cancelled
+              appointments over time.
+            </p>
+
           </div>
+
         </div>
 
 
-        <div class="distribution">
+        <div class="real-chart-container">
 
-          <div class="distribution-row">
-            <div class="distribution-name">
-              <span class="dot scheduled-dot">
-              </span>
-
-              Scheduled
-
-              <b>
-                {{
-                  data.status
-                    .scheduled
-                }}
-              </b>
-            </div>
-
-            <div class="distribution-track">
-              <div
-                class="distribution-fill scheduled-fill"
-                [style.width.%]="
-                  statusPercent(
-                    data.status.scheduled
-                  )
-                "
-              >
-              </div>
-            </div>
-          </div>
-
-
-          <div class="distribution-row">
-            <div class="distribution-name">
-              <span class="dot completed-dot">
-              </span>
-
-              Completed
-
-              <b>
-                {{
-                  data.status
-                    .completed
-                }}
-              </b>
-            </div>
-
-            <div class="distribution-track">
-              <div
-                class="distribution-fill completed-fill"
-                [style.width.%]="
-                  statusPercent(
-                    data.status.completed
-                  )
-                "
-              >
-              </div>
-            </div>
-          </div>
-
-
-          <div class="distribution-row">
-            <div class="distribution-name">
-              <span class="dot cancelled-dot">
-              </span>
-
-              Cancelled
-
-              <b>
-                {{
-                  data.status
-                    .cancelled
-                }}
-              </b>
-            </div>
-
-            <div class="distribution-track">
-              <div
-                class="distribution-fill cancelled-fill"
-                [style.width.%]="
-                  statusPercent(
-                    data.status.cancelled
-                  )
-                "
-              >
-              </div>
-            </div>
-          </div>
+          <canvas
+            baseChart
+            [data]="appointmentChartData"
+            [options]="lineChartOptions"
+            [type]="'line'"
+          >
+          </canvas>
 
         </div>
 
       </article>
 
 
-      <article class="chart-card">
+      <!-- THERAPIST REVENUE -->
 
-        <div class="chart-title">
-          <div>
-            <small>
-              COLLECTION
-            </small>
-
-            <h2>
-              Payment status
-            </h2>
-          </div>
-        </div>
-
-
-        <div class="payment-overview">
-
-          <div class="payment-number">
-            <strong>
-              {{
-                data.payments
-                  .paid
-              }}
-            </strong>
-
-            <span>
-              Paid sessions
-            </span>
-          </div>
-
-          <div class="payment-number">
-            <strong>
-              {{
-                data.payments
-                  .unpaid
-              }}
-            </strong>
-
-            <span>
-              Unpaid sessions
-            </span>
-          </div>
-
-        </div>
-
-
-        <div class="payment-bar">
-
-          <div
-            class="payment-paid"
-            [style.width.%]="
-              paymentPercent(
-                data.payments.paid
-              )
-            "
-          >
-          </div>
-
-          <div
-            class="payment-unpaid"
-            [style.width.%]="
-              paymentPercent(
-                data.payments.unpaid
-              )
-            "
-          >
-          </div>
-
-        </div>
-
-
-        <div class="payment-legend">
-
-          <span>
-            <i class="paid-legend">
-            </i>
-
-            Paid
-          </span>
-
-          <span>
-            <i class="unpaid-legend">
-            </i>
-
-            Unpaid
-          </span>
-
-        </div>
-
-      </article>
-
-    </section>
-
-
-    <!-- ===================================== -->
-    <!-- THERAPIST REVENUE                     -->
-    <!-- ===================================== -->
-
-    <article
-      class="chart-card full-width"
-      *ngIf="
-        !selectedTherapist
-      "
-    >
-
-      <div class="chart-title">
-        <div>
-          <small>
-            TEAM
-          </small>
-
-          <h2>
-            Revenue by therapist
-          </h2>
-        </div>
-      </div>
-
-
-      <div
-        class="horizontal-bars"
+      <article
+        class="chart-card"
         *ngIf="
-          data
-            .therapistPerformance
-            .length
+          !selectedTherapist
         "
       >
 
-        <div
-          class="horizontal-row"
-          *ngFor="
-            let therapist
-            of data
-              .therapistPerformance
-          "
-        >
+        <div class="chart-title">
 
-          <div class="horizontal-info">
-            <b>
-              {{ therapist.name }}
-            </b>
+          <div>
 
-            <span>
-              {{
-                money(
-                  therapist.revenue
-                )
-              }}
-            </span>
-          </div>
+            <small>
+              TEAM
+            </small>
 
-          <div class="horizontal-track">
-            <div
-              class="horizontal-fill"
-              [style.width.%]="
-                therapistRevenueWidth(
-                  therapist.revenue
-                )
-              "
-            >
-            </div>
+            <h2>
+              Revenue by therapist
+            </h2>
+
+            <p>
+              Paid revenue attributed to
+              each treating therapist.
+            </p>
+
           </div>
 
         </div>
 
-      </div>
 
-    </article>
+        <div class="real-chart-container">
+
+          <canvas
+            baseChart
+            [data]="therapistRevenueChartData"
+            [options]="barChartOptions"
+            [type]="'bar'"
+          >
+          </canvas>
+
+        </div>
+
+      </article>
 
 
-    <!-- ===================================== -->
-    <!-- BUSIEST DAYS / HOURS                  -->
-    <!-- ===================================== -->
-
-    <section class="charts-grid">
+      <!-- STATUS -->
 
       <article class="chart-card">
 
         <div class="chart-title">
+
           <div>
+
+            <small>
+              STATUS
+            </small>
+
+            <h2>
+              Appointment status
+            </h2>
+
+            <p>
+              Scheduled, completed and
+              cancelled appointments.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            real-chart-container
+            doughnut-chart
+          "
+        >
+
+          <canvas
+            baseChart
+            [data]="statusChartData"
+            [options]="doughnutChartOptions"
+            [type]="'doughnut'"
+          >
+          </canvas>
+
+        </div>
+
+      </article>
+
+
+      <!-- BUSIEST DAYS -->
+
+      <article
+        class="
+          chart-card
+          full-chart
+        "
+      >
+
+        <div class="chart-title">
+
+          <div>
+
             <small>
               WORKLOAD
             </small>
 
             <h2>
-              Busiest days
+              Appointments by day
             </h2>
+
+            <p>
+              See which days of the week
+              carry the highest workload.
+            </p>
+
           </div>
+
         </div>
 
 
-        <div class="horizontal-bars">
+        <div class="real-chart-container">
 
-          <div
-            class="horizontal-row"
-            *ngFor="
-              let item
-              of data.busiestDays
-            "
+          <canvas
+            baseChart
+            [data]="busiestDaysChartData"
+            [options]="barChartOptions"
+            [type]="'bar'"
           >
+          </canvas>
 
-            <div class="horizontal-info">
-              <b>
-                {{ item.day }}
-              </b>
-
-              <span>
-                {{
-                  item.appointments
-                }}
-              </span>
-            </div>
-
-            <div class="horizontal-track">
-              <div
-                class="horizontal-fill day-fill"
-                [style.width.%]="
-                  dayWidth(
-                    item.appointments
-                  )
-                "
-              >
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-      </article>
-
-
-      <article class="chart-card">
-
-        <div class="chart-title">
-          <div>
-            <small>
-              SCHEDULE
-            </small>
-
-            <h2>
-              Busiest hours
-            </h2>
-          </div>
-        </div>
-
-
-        <div
-          class="horizontal-bars"
-          *ngIf="
-            data.busiestHours.length
-          "
-        >
-
-          <div
-            class="horizontal-row"
-            *ngFor="
-              let item
-              of data.busiestHours
-            "
-          >
-
-            <div class="horizontal-info">
-              <b>
-                {{ item.label }}
-              </b>
-
-              <span>
-                {{
-                  item.appointments
-                }}
-              </span>
-            </div>
-
-            <div class="horizontal-track">
-              <div
-                class="horizontal-fill hour-fill"
-                [style.width.%]="
-                  hourWidth(
-                    item.appointments
-                  )
-                "
-              >
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-
-        <div
-          class="empty-chart"
-          *ngIf="
-            !data.busiestHours.length
-          "
-        >
-          No appointments.
         </div>
 
       </article>
@@ -935,13 +689,15 @@
 
 
     <!-- ===================================== -->
-    <!-- THERAPIST TABLE                       -->
+    <!-- THERAPIST PERFORMANCE                 -->
     <!-- ===================================== -->
 
     <article class="performance-card">
 
       <div class="chart-title">
+
         <div>
+
           <small>
             PERFORMANCE
           </small>
@@ -949,7 +705,14 @@
           <h2>
             Therapist summary
           </h2>
+
+          <p>
+            Appointment and financial
+            performance by therapist.
+          </p>
+
         </div>
+
       </div>
 
 
@@ -958,7 +721,9 @@
         <table>
 
           <thead>
+
             <tr>
+
               <th>
                 Therapist
               </th>
@@ -969,6 +734,10 @@
 
               <th>
                 Completed
+              </th>
+
+              <th>
+                Scheduled
               </th>
 
               <th>
@@ -994,7 +763,13 @@
               <th>
                 Completion
               </th>
+
+              <th>
+                Cancellation
+              </th>
+
             </tr>
+
           </thead>
 
 
@@ -1009,30 +784,33 @@
             >
 
               <td>
+
                 <strong>
-                  {{
-                    therapist.name
-                  }}
+                  {{ therapist.name }}
                 </strong>
+
               </td>
 
-              <td>
-                {{
-                  therapist.appointments
-                }}
-              </td>
 
               <td>
-                {{
-                  therapist.completed
-                }}
+                {{ therapist.appointments }}
               </td>
 
+
               <td>
-                {{
-                  therapist.cancelled
-                }}
+                {{ therapist.completed }}
               </td>
+
+
+              <td>
+                {{ therapist.scheduled }}
+              </td>
+
+
+              <td>
+                {{ therapist.cancelled }}
+              </td>
+
 
               <td>
                 {{
@@ -1041,6 +819,7 @@
                 }}
               </td>
 
+
               <td>
                 {{
                   therapist
@@ -1048,32 +827,78 @@
                 }}
               </td>
 
+
               <td class="money-cell">
-                {{
-                  money(
-                    therapist.revenue
-                  )
-                }}
+
+                ${{ money(
+                  therapist.revenue
+                ) }}
+
               </td>
 
-              <td>
-                {{
-                  money(
-                    therapist
-                      .averageRevenue
-                  )
-                }}
-              </td>
 
               <td>
+
+                ${{ money(
+                  therapist.averageRevenue
+                ) }}
+
+              </td>
+
+
+              <td>
+
                 <span class="rate-pill">
+
                   {{
                     percent(
                       therapist
                         .completionRate
                     )
                   }}
+
                 </span>
+
+              </td>
+
+
+              <td>
+
+                <span
+                  class="
+                    rate-pill
+                    cancellation-pill
+                  "
+                >
+
+                  {{
+                    percent(
+                      therapist
+                        .cancellationRate
+                    )
+                  }}
+
+                </span>
+
+              </td>
+
+            </tr>
+
+
+            <tr
+              *ngIf="
+                !data
+                  .therapistPerformance
+                  .length
+              "
+            >
+
+              <td
+                colspan="11"
+                class="empty-table"
+              >
+                No therapist statistics
+                available for this period.
               </td>
 
             </tr>

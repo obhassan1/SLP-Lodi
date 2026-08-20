@@ -4,6 +4,11 @@ import {
 } from '@angular/core';
 
 import {
+  ChartData,
+  ChartOptions
+} from 'chart.js';
+
+import {
   User
 } from '../../models/patient.model';
 
@@ -27,102 +32,295 @@ type Period =
 
 
 @Component({
-  selector:
-    'app-statistics',
-
-  templateUrl:
-    './statistics.component.html',
-
-  styleUrls: [
-    './statistics.component.css'
-  ]
+  selector: 'app-statistics',
+  templateUrl: './statistics.component.html',
+  styleUrls: ['./statistics.component.css']
 })
-export class StatisticsComponent
-implements OnInit {
+export class StatisticsComponent implements OnInit {
 
-  loading =
-    false;
+  loading = false;
 
-  error =
-    '';
+  error = '';
 
-  data:
-    AdminStatistics |
-    null =
-      null;
+  data: AdminStatistics | null = null;
 
-  therapists:
-    User[] =
-      [];
+  therapists: User[] = [];
 
-  selectedTherapist =
-    '';
+  selectedTherapist = '';
 
-  period:
-    Period =
-      'thisMonth';
+  period: Period = 'thisMonth';
 
-  customFrom =
-    '';
+  customFrom = '';
 
-  customTo =
-    '';
+  customTo = '';
+
+
+  /*
+   * =========================================
+   * REVENUE CHART
+   * =========================================
+   */
+
+  revenueChartData: ChartData<'line'> = {
+    labels: [],
+
+    datasets: [
+      {
+        label: 'Revenue',
+        data: [],
+        tension: 0.35,
+        fill: false
+      }
+    ]
+  };
+
+
+  /*
+   * =========================================
+   * APPOINTMENT TREND CHART
+   * =========================================
+   */
+
+  appointmentChartData: ChartData<'line'> = {
+    labels: [],
+
+    datasets: [
+      {
+        label: 'Appointments',
+        data: [],
+        tension: 0.35,
+        fill: false
+      },
+
+      {
+        label: 'Completed',
+        data: [],
+        tension: 0.35,
+        fill: false
+      },
+
+      {
+        label: 'Cancelled',
+        data: [],
+        tension: 0.35,
+        fill: false
+      }
+    ]
+  };
+
+
+  /*
+   * =========================================
+   * REVENUE BY THERAPIST
+   * =========================================
+   */
+
+  therapistRevenueChartData: ChartData<'bar'> = {
+    labels: [],
+
+    datasets: [
+      {
+        label: 'Revenue',
+        data: []
+      }
+    ]
+  };
+
+
+  /*
+   * =========================================
+   * APPOINTMENT STATUS
+   * =========================================
+   */
+
+  statusChartData: ChartData<'doughnut'> = {
+    labels: [
+      'Scheduled',
+      'Completed',
+      'Cancelled'
+    ],
+
+    datasets: [
+      {
+        data: []
+      }
+    ]
+  };
+
+
+  /*
+   * =========================================
+   * BUSIEST DAYS
+   * =========================================
+   */
+
+  busiestDaysChartData: ChartData<'bar'> = {
+    labels: [],
+
+    datasets: [
+      {
+        label: 'Appointments',
+        data: []
+      }
+    ]
+  };
+
+
+  /*
+   * =========================================
+   * CHART OPTIONS
+   * =========================================
+   */
+
+  readonly lineChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+
+    maintainAspectRatio: false,
+
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom'
+      }
+    },
+
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
+
+
+  readonly barChartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+
+    maintainAspectRatio: false,
+
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom'
+      }
+    },
+
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    }
+  };
+
+
+  readonly doughnutChartOptions: ChartOptions<'doughnut'> = {
+    responsive: true,
+
+    maintainAspectRatio: false,
+
+    plugins: {
+      legend: {
+        display: true,
+        position: 'bottom'
+      }
+    }
+  };
 
 
   constructor(
-    private statisticsApi:
-      StatisticsService,
-
-    private usersApi:
-      UserService
+    private statisticsApi: StatisticsService,
+    private usersApi: UserService
   ) {}
 
 
   ngOnInit(): void {
+
     this.loadTherapists();
 
     this.load();
+
   }
 
 
+  /*
+   * =========================================
+   * LOAD THERAPISTS
+   * =========================================
+   */
+
   loadTherapists(): void {
+
     this.usersApi
       .list()
       .subscribe({
-        next:
-          users => {
-            this.therapists =
-              users.filter(
-                user =>
-                  user.active &&
-                  (
-                    user.role ===
-                      'therapist' ||
-                    !!user
-                      .canTreatPatients
-                  )
-              );
-          }
+
+        next: users => {
+
+          this.therapists =
+            users.filter(
+              user =>
+                user.active &&
+                (
+                  user.role === 'therapist' ||
+                  !!user.canTreatPatients
+                )
+            );
+
+        },
+
+        error: error => {
+
+          console.error(
+            'Could not load therapists',
+            error
+          );
+
+        }
+
       });
+
   }
 
+
+  /*
+   * =========================================
+   * PERIOD CHANGED
+   * =========================================
+   */
 
   changePeriod(): void {
+
     if (
-      this.period !==
-      'custom'
+      this.period !== 'custom'
     ) {
+
       this.load();
+
     }
+
   }
 
+
+  /*
+   * =========================================
+   * CUSTOM DATE RANGE
+   * =========================================
+   */
 
   applyCustomRange(): void {
+
     this.load();
+
   }
 
 
+  /*
+   * =========================================
+   * LOAD STATISTICS
+   * =========================================
+   */
+
   load(): void {
+
     const range =
       this.getRange();
 
@@ -139,45 +337,310 @@ implements OnInit {
         this.selectedTherapist
       )
       .subscribe({
-        next:
-          response => {
-            this.data =
-              response;
 
-            this.loading =
-              false;
-          },
+        next: response => {
 
-        error:
-          error => {
-            this.loading =
-              false;
+          this.data =
+            response;
 
-            this.error =
-              error?.error
-                ?.message ||
-              'Could not load statistics';
-          }
+          this.buildCharts();
+
+          this.loading =
+            false;
+
+        },
+
+        error: error => {
+
+          console.error(
+            'Statistics error:',
+            error
+          );
+
+          this.loading =
+            false;
+
+          this.error =
+            error?.error?.message ||
+            'Could not load statistics';
+
+        }
+
       });
+
   }
 
+
+  /*
+   * =========================================
+   * BUILD ALL CHARTS
+   * =========================================
+   */
+
+  buildCharts(): void {
+
+    if (
+      !this.data
+    ) {
+
+      return;
+
+    }
+
+
+    const months =
+      this.data.monthlyTrend;
+
+
+    /*
+     * REVENUE
+     */
+
+    this.revenueChartData = {
+
+      labels:
+        months.map(
+          item =>
+            item.label
+        ),
+
+      datasets: [
+        {
+
+          label:
+            'Revenue',
+
+          data:
+            months.map(
+              item =>
+                Number(
+                  item.revenue || 0
+                )
+            ),
+
+          tension:
+            0.35,
+
+          fill:
+            false
+
+        }
+      ]
+
+    };
+
+
+    /*
+     * APPOINTMENTS
+     */
+
+    this.appointmentChartData = {
+
+      labels:
+        months.map(
+          item =>
+            item.label
+        ),
+
+      datasets: [
+
+        {
+
+          label:
+            'Appointments',
+
+          data:
+            months.map(
+              item =>
+                item.appointments
+            ),
+
+          tension:
+            0.35,
+
+          fill:
+            false
+
+        },
+
+        {
+
+          label:
+            'Completed',
+
+          data:
+            months.map(
+              item =>
+                item.completed
+            ),
+
+          tension:
+            0.35,
+
+          fill:
+            false
+
+        },
+
+        {
+
+          label:
+            'Cancelled',
+
+          data:
+            months.map(
+              item =>
+                item.cancelled
+            ),
+
+          tension:
+            0.35,
+
+          fill:
+            false
+
+        }
+
+      ]
+
+    };
+
+
+    /*
+     * REVENUE BY THERAPIST
+     */
+
+    this.therapistRevenueChartData = {
+
+      labels:
+        this.data
+          .therapistPerformance
+          .map(
+            therapist =>
+              therapist.name
+          ),
+
+      datasets: [
+        {
+
+          label:
+            'Revenue',
+
+          data:
+            this.data
+              .therapistPerformance
+              .map(
+                therapist =>
+                  Number(
+                    therapist.revenue || 0
+                  )
+              )
+
+        }
+      ]
+
+    };
+
+
+    /*
+     * APPOINTMENT STATUS
+     */
+
+    this.statusChartData = {
+
+      labels: [
+        'Scheduled',
+        'Completed',
+        'Cancelled'
+      ],
+
+      datasets: [
+        {
+
+          data: [
+
+            this.data
+              .status
+              .scheduled,
+
+            this.data
+              .status
+              .completed,
+
+            this.data
+              .status
+              .cancelled
+
+          ]
+
+        }
+      ]
+
+    };
+
+
+    /*
+     * BUSIEST DAYS
+     */
+
+    this.busiestDaysChartData = {
+
+      labels:
+        this.data
+          .busiestDays
+          .map(
+            item =>
+              item.day
+          ),
+
+      datasets: [
+        {
+
+          label:
+            'Appointments',
+
+          data:
+            this.data
+              .busiestDays
+              .map(
+                item =>
+                  item.appointments
+              )
+
+        }
+      ]
+
+    };
+
+  }
+
+
+  /*
+   * =========================================
+   * DATE RANGE
+   * =========================================
+   */
 
   getRange(): {
     from?: string;
     to?: string;
   } {
-    if (
-      this.period ===
-      'all'
-    ) {
-      return {};
-    }
 
     if (
-      this.period ===
-      'custom'
+      this.period === 'all'
     ) {
+
+      return {};
+
+    }
+
+
+    if (
+      this.period === 'custom'
+    ) {
+
       return {
+
         from:
           this.customFrom ||
           undefined,
@@ -185,8 +648,11 @@ implements OnInit {
         to:
           this.customTo ||
           undefined
+
       };
+
     }
+
 
     const now =
       new Date();
@@ -201,10 +667,15 @@ implements OnInit {
         now
       );
 
+
+    /*
+     * THIS MONTH
+     */
+
     if (
-      this.period ===
-      'thisMonth'
+      this.period === 'thisMonth'
     ) {
+
       from =
         new Date(
           now.getFullYear(),
@@ -218,13 +689,18 @@ implements OnInit {
           now.getMonth() + 1,
           0
         );
+
     }
 
 
+    /*
+     * LAST MONTH
+     */
+
     if (
-      this.period ===
-      'lastMonth'
+      this.period === 'lastMonth'
     ) {
+
       from =
         new Date(
           now.getFullYear(),
@@ -238,13 +714,18 @@ implements OnInit {
           now.getMonth(),
           0
         );
+
     }
 
 
+    /*
+     * THIS YEAR
+     */
+
     if (
-      this.period ===
-      'thisYear'
+      this.period === 'thisYear'
     ) {
+
       from =
         new Date(
           now.getFullYear(),
@@ -258,13 +739,18 @@ implements OnInit {
           11,
           31
         );
+
     }
 
 
+    /*
+     * LAST 12 MONTHS
+     */
+
     if (
-      this.period ===
-      'last12Months'
+      this.period === 'last12Months'
     ) {
+
       from =
         new Date(
           now.getFullYear(),
@@ -278,10 +764,12 @@ implements OnInit {
           now.getMonth() + 1,
           0
         );
+
     }
 
 
     return {
+
       from:
         this.formatDate(
           from
@@ -291,35 +779,53 @@ implements OnInit {
         this.formatDate(
           to
         )
+
     };
+
   }
 
+
+  /*
+   * =========================================
+   * FORMAT DATE
+   * =========================================
+   */
 
   private formatDate(
     date: Date
   ): string {
+
     const year =
       date.getFullYear();
 
     const month =
       String(
         date.getMonth() + 1
-      ).padStart(
-        2,
-        '0'
-      );
+      )
+        .padStart(
+          2,
+          '0'
+        );
 
     const day =
       String(
         date.getDate()
-      ).padStart(
-        2,
-        '0'
-      );
+      )
+        .padStart(
+          2,
+          '0'
+        );
 
     return `${year}-${month}-${day}`;
+
   }
 
+
+  /*
+   * =========================================
+   * FORMAT MONEY
+   * =========================================
+   */
 
   money(
     value:
@@ -327,25 +833,29 @@ implements OnInit {
       null |
       undefined
   ): string {
+
     return new Intl
       .NumberFormat(
         'en-US',
         {
-          minimumFractionDigits:
-            0,
-
-          maximumFractionDigits:
-            2
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 2
         }
       )
       .format(
         Number(
-          value ||
-          0
+          value || 0
         )
       );
+
   }
 
+
+  /*
+   * =========================================
+   * FORMAT PERCENT
+   * =========================================
+   */
 
   percent(
     value:
@@ -353,211 +863,11 @@ implements OnInit {
       null |
       undefined
   ): string {
+
     return `${Number(
-      value ||
-      0
+      value || 0
     ).toFixed(1)}%`;
+
   }
 
-
-  maxRevenue(): number {
-    const values =
-      this.data
-        ?.monthlyTrend
-        .map(
-          item =>
-            item.revenue
-        ) ||
-      [];
-
-    return Math.max(
-      ...values,
-      1
-    );
-  }
-
-
-  revenueHeight(
-    revenue: number
-  ): number {
-    return Math.max(
-      4,
-      (
-        revenue /
-        this.maxRevenue()
-      ) * 100
-    );
-  }
-
-
-  maxMonthlyAppointments():
-    number {
-    const values =
-      this.data
-        ?.monthlyTrend
-        .map(
-          item =>
-            item.appointments
-        ) ||
-      [];
-
-    return Math.max(
-      ...values,
-      1
-    );
-  }
-
-
-  appointmentHeight(
-    count: number
-  ): number {
-    return Math.max(
-      4,
-      (
-        count /
-        this
-          .maxMonthlyAppointments()
-      ) * 100
-    );
-  }
-
-
-  maxTherapistRevenue():
-    number {
-    const values =
-      this.data
-        ?.therapistPerformance
-        .map(
-          item =>
-            item.revenue
-        ) ||
-      [];
-
-    return Math.max(
-      ...values,
-      1
-    );
-  }
-
-
-  therapistRevenueWidth(
-    revenue: number
-  ): number {
-    return (
-      revenue /
-      this
-        .maxTherapistRevenue()
-    ) * 100;
-  }
-
-
-  maxDayCount(): number {
-    const values =
-      this.data
-        ?.busiestDays
-        .map(
-          item =>
-            item.appointments
-        ) ||
-      [];
-
-    return Math.max(
-      ...values,
-      1
-    );
-  }
-
-
-  dayWidth(
-    count: number
-  ): number {
-    return (
-      count /
-      this.maxDayCount()
-    ) * 100;
-  }
-
-
-  maxHourCount(): number {
-    const values =
-      this.data
-        ?.busiestHours
-        .map(
-          item =>
-            item.appointments
-        ) ||
-      [];
-
-    return Math.max(
-      ...values,
-      1
-    );
-  }
-
-
-  hourWidth(
-    count: number
-  ): number {
-    return (
-      count /
-      this.maxHourCount()
-    ) * 100;
-  }
-
-
-  statusTotal(): number {
-    if (!this.data) {
-      return 1;
-    }
-
-    return Math.max(
-      this.data
-        .status
-        .scheduled +
-      this.data
-        .status
-        .completed +
-      this.data
-        .status
-        .cancelled,
-      1
-    );
-  }
-
-
-  statusPercent(
-    value: number
-  ): number {
-    return (
-      value /
-      this.statusTotal()
-    ) * 100;
-  }
-
-
-  paymentTotal(): number {
-    if (!this.data) {
-      return 1;
-    }
-
-    return Math.max(
-      this.data
-        .payments
-        .paid +
-      this.data
-        .payments
-        .unpaid,
-      1
-    );
-  }
-
-
-  paymentPercent(
-    value: number
-  ): number {
-    return (
-      value /
-      this.paymentTotal()
-    ) * 100;
-  }
 }
