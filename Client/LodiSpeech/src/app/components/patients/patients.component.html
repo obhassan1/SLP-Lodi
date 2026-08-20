@@ -26,10 +26,13 @@
     <article class="panel detail" *ngIf="selected">
       <div class="patient-title-row">
         <h2>{{selected.name}}</h2>
-        <button
+<button
   *ngIf="
-    auth.user?.role === 'therapist' ||
-    auth.user?.role === 'admin'
+    (
+      auth.user?.role === 'therapist' ||
+      auth.user?.role === 'admin'
+    ) &&
+    isAssignedToSelectedPatient()
   "
   class="anamnesis-btn"
   type="button"

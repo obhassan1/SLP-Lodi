@@ -5,7 +5,19 @@
       <h1>Anamnesis</h1>
       <p *ngIf="patient">{{ patient.name }} · DOB {{ patient.dateOfBirth | date:'longDate' }} · Age {{ age }}</p>
     </div>
-    <button class="cancel" type="button" (click)="back()">← Back to patients</button>
+    <button
+  class="back-patients-btn"
+  type="button"
+  (click)="back()"
+>
+  <span class="back-arrow">
+    ←
+  </span>
+
+  <span>
+    Back to patients
+  </span>
+</button>
   </header>
 
   <p class="notice" *ngIf="loading">Loading anamnesis...</p>

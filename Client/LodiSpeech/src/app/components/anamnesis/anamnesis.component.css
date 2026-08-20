@@ -36,3 +36,114 @@ input:disabled { background: #f6f3f7; color: #6f6573; }
 .save-bar small { margin-top: 3px; color: #786c7d; }
 .success { color: #287a5b; font-size: 12px; font-weight: 700; }
 @media (max-width: 800px) { .grid.two, .grid.three, .checks.three, .split-checks, .split-checks.three-cols { grid-template-columns: 1fr; } .sibling-row { grid-template-columns: 1fr; } .save-bar { flex-wrap: wrap; } .save-bar .primary { width: 100%; } }
+.back-patients-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  min-height: 40px;
+
+  padding:
+    9px
+    15px;
+
+  border:
+    1px solid
+    #dccfe2;
+
+  border-radius:
+    10px;
+
+  background:
+    #ffffff;
+
+  color:
+    #6f00a8;
+
+  font-size:
+    13px;
+
+  font-weight:
+    700;
+
+  font-family:
+    inherit;
+
+  cursor:
+    pointer;
+
+  white-space:
+    nowrap;
+
+  box-shadow:
+    0 2px 8px
+    rgba(
+      67,
+      37,
+      79,
+      0.06
+    );
+
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+}
+
+.back-patients-btn:hover {
+  background:
+    #f7effa;
+
+  border-color:
+    #c9afd5;
+
+  box-shadow:
+    0 4px 12px
+    rgba(
+      67,
+      37,
+      79,
+      0.1
+    );
+}
+
+.back-patients-btn:active {
+  transform:
+    translateY(1px);
+}
+
+.back-patients-btn:focus-visible {
+  outline:
+    3px solid
+    rgba(
+      111,
+      0,
+      168,
+      0.14
+    );
+
+  outline-offset:
+    2px;
+}
+
+.back-arrow {
+  font-size:
+    18px;
+
+  line-height:
+    1;
+}
+
+@media (
+  max-width: 600px
+) {
+  .back-patients-btn {
+    width:
+      100%;
+
+    margin-top:
+      10px;
+  }
+}

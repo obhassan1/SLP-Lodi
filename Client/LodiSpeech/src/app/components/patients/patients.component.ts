@@ -41,6 +41,30 @@ export class PatientsComponent implements OnInit {
             });
         }
     }
+
+    isAssignedToSelectedPatient(): boolean {
+  if (
+    !this.selected ||
+    !this.auth.user?._id
+  ) {
+    return false;
+  }
+
+  const assigned =
+    this.selected.assignedTherapists || [];
+
+  return assigned.some(item => {
+    const therapistId =
+      typeof item === 'string'
+        ? item
+        : item._id;
+
+    return (
+      therapistId ===
+      this.auth.user?._id
+    );
+  });
+}
     load() {
         this.loading = true;
         this.practice.getPatients(this.search).subscribe({
@@ -99,11 +123,18 @@ openAnamnesis(): void {
     return;
   }
 
-  const role = this.auth.user?.role;
+  const role =
+    this.auth.user?.role;
 
   if (
     role !== 'therapist' &&
     role !== 'admin'
+  ) {
+    return;
+  }
+
+  if (
+    !this.isAssignedToSelectedPatient()
   ) {
     return;
   }
