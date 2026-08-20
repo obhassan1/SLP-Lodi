@@ -9,8 +9,46 @@
       <a routerLink="/patients" routerLinkActive="active">♙ <span>Patients</span></a>
       <a routerLink="/appointments" routerLinkActive="active">▣ <span>Appointments</span></a>
       <a routerLink="/payments" routerLinkActive="active">◉ <span>Payments</span></a>
-      <a routerLink="/session-notes" routerLinkActive="active">✎ <span>Session notes</span></a>
-      <a *ngIf="auth.user?.role === 'admin'" routerLink="/users" routerLinkActive="active">⚙ <span>Users</span></a>
+<a
+  routerLink="/session-notes"
+  routerLinkActive="active"
+>
+  ✎
+
+  <span>
+    Session notes
+  </span>
+</a>
+
+
+<a
+  *ngIf="
+    auth.user?.role === 'admin'
+  "
+  routerLink="/statistics"
+  routerLinkActive="active"
+>
+  ▥
+
+  <span>
+    Statistics
+  </span>
+</a>
+
+
+<a
+  *ngIf="
+    auth.user?.role === 'admin'
+  "
+  routerLink="/users"
+  routerLinkActive="active"
+>
+  ⚙
+
+  <span>
+    Users
+  </span>
+</a>
     </nav>
     <div class="quote">
       ✦<strong>Small steps, big voices.</strong>

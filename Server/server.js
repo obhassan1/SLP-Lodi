@@ -9,6 +9,7 @@ const userRoutes = require('./routes/user.routes');
 const patientRoutes = require('./routes/patient.routes');
 const appointmentRoutes = require('./routes/appointment.routes');
 const { requireAuth } = require('./middleware/auth.middleware');
+const statisticsRoutes = require('./routes/statistics.routes');
 
 const app = express();
 
@@ -120,6 +121,13 @@ app.use(
   requireAuth,
   appointmentRoutes
 );
+
+app.use(
+  '/api/statistics',
+  requireAuth,
+  statisticsRoutes
+);
+
 
 /* =========================================================
    404 API ROUTE

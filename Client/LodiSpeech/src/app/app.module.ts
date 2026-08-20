@@ -15,6 +15,7 @@ import { SessionNotesComponent } from './components/session-notes/session-notes.
 import { UnpaidCountPipe } from './pipes/unpaid-count.pipe';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { AnamnesisComponent } from './components/anamnesis/anamnesis.component';
-@NgModule({ declarations: [AppComponent, LandingComponent, LoginComponent, UsersComponent, DashboardComponent, PatientsComponent, AppointmentsComponent, PaymentsComponent, SessionNotesComponent, AnamnesisComponent, UnpaidCountPipe], imports: [BrowserModule, HttpClientModule, FormsModule, ReactiveFormsModule, AppRoutingModule], providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }], bootstrap: [AppComponent] })
+import { StatisticsComponent } from './components/statistics/statistics.component';
+@NgModule({ declarations: [StatisticsComponent, AppComponent, LandingComponent, LoginComponent, UsersComponent, DashboardComponent, PatientsComponent, AppointmentsComponent, PaymentsComponent, SessionNotesComponent, AnamnesisComponent, UnpaidCountPipe], imports: [BrowserModule, HttpClientModule, FormsModule, ReactiveFormsModule, AppRoutingModule], providers: [{ provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }], bootstrap: [AppComponent] })
 export class AppModule {
 }

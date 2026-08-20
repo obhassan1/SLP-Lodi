@@ -12,6 +12,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { TherapistGuard } from './guards/therapist.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { AnamnesisComponent } from './components/anamnesis/anamnesis.component';
+import { StatisticsComponent } from './components/statistics/statistics.component';
 
 const routes: Routes = [
   { path: '', component: LandingComponent },
@@ -26,6 +27,18 @@ const routes: Routes = [
     component: SessionNotesComponent,
     canActivate: [AuthGuard, TherapistGuard]
   },
+
+  {
+  path: 'statistics',
+
+  component:
+    StatisticsComponent,
+
+  canActivate: [
+    AuthGuard,
+    AdminGuard
+  ]
+},
   {
     path: 'users',
     component: UsersComponent,
