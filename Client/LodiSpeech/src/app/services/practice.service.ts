@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Appointment, Patient, SessionNote } from '../models/patient.model';
 import { environment } from '../../environments/environment';
+import { AnamnesisReport } from '../models/anamnesis.model';
 @Injectable({ providedIn: 'root' })
 export class PracticeService {
     private api = environment.apiUrl;
@@ -63,6 +64,16 @@ export class PracticeService {
             focus,
             note
         });
+    }
+
+    getAnamnesis(id: string) {
+        return this.http.get<any>(`${this.api}/patients/${id}/anamnesis`);
+    }
+    createAnamnesis(id: string, report: AnamnesisReport) {
+        return this.http.post<any>(`${this.api}/patients/${id}/anamnesis`, report);
+    }
+    updateAnamnesis(id: string, report: AnamnesisReport) {
+        return this.http.put<any>(`${this.api}/patients/${id}/anamnesis`, report);
     }
 
 cancelAppointment(id: string) {

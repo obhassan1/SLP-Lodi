@@ -16,6 +16,7 @@ export class UserService {
         role: 'admin' | 'therapist';
         canManageLocation?: boolean;
         canTreatPatients?: boolean;
+        canCreateAnamnesis?: boolean;
     }) { return this.http.post<User>(this.api, input); }
     update(id: string, input: Partial<User> & {
         password?: string;

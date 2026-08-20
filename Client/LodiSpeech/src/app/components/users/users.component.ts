@@ -24,7 +24,8 @@ export class UsersComponent implements OnInit {
     role: ['therapist' as 'admin' | 'therapist', Validators.required],
     active: [true],
     canManageLocation: [false],
-    canTreatPatients: [false]
+    canTreatPatients: [false],
+    canCreateAnamnesis: [false]
   });
 
   constructor(
@@ -65,7 +66,8 @@ export class UsersComponent implements OnInit {
       role: 'therapist',
       active: true,
       canManageLocation: false,
-      canTreatPatients: true
+      canTreatPatients: true,
+      canCreateAnamnesis: false
     });
     this.showForm = true;
   }
@@ -87,7 +89,13 @@ export class UsersComponent implements OnInit {
       role: user.role,
       active: user.active,
       canManageLocation: !!user.canManageLocation,
-      canTreatPatients: user.role === 'therapist' || !!user.canTreatPatients
+      canTreatPatients: user.role === 'therapist' || !!user.canTreatPatients,
+      canCreateAnamnesis:
+  (
+    user.role === 'therapist' ||
+    user.role === 'admin'
+  ) &&
+  !!user.canCreateAnamnesis
     });
     this.showForm = true;
   }
@@ -118,7 +126,13 @@ export class UsersComponent implements OnInit {
         ? !!value.canManageLocation
         : false,
       canTreatPatients: value.role === 'therapist' ||
-        !!value.canTreatPatients
+        !!value.canTreatPatients,
+canCreateAnamnesis:
+  (
+    value.role === 'therapist' ||
+    value.role === 'admin'
+  ) &&
+  !!value.canCreateAnamnesis
     };
 
     const request = this.editingUser

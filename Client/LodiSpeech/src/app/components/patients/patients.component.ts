@@ -4,6 +4,7 @@ import { Appointment, Patient, User } from '../../models/patient.model';
 import { AuthService } from '../../services/auth.service';
 import { PracticeService } from '../../services/practice.service';
 import { UserService } from '../../services/user.service';
+import { Router } from '@angular/router';
 @Component({
     selector: 'app-patients',
     templateUrl: './patients.component.html',
@@ -28,7 +29,7 @@ export class PatientsComponent implements OnInit {
         email: ['', Validators.email],
         therapyFocus: ['', Validators.required]
     });
-    constructor(private fb: FormBuilder, private practice: PracticeService, private usersApi: UserService, public auth: AuthService) { }
+    constructor(private fb: FormBuilder, private practice: PracticeService, private usersApi: UserService, public auth: AuthService, private router: Router) { }
     ngOnInit() {
         this.load();
         if (this.auth.user?.role === 'admin') {
@@ -93,6 +94,26 @@ export class PatientsComponent implements OnInit {
             this.assignmentMessage = 'Patient access updated.';
         });
     }
+openAnamnesis(): void {
+  if (!this.selected?._id) {
+    return;
+  }
+
+  const role = this.auth.user?.role;
+
+  if (
+    role !== 'therapist' &&
+    role !== 'admin'
+  ) {
+    return;
+  }
+
+  this.router.navigate([
+    '/patients',
+    this.selected._id,
+    'anamnesis'
+  ]);
+}
     save() {
         if (this.form.invalid)
             return;

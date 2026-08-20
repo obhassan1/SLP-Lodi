@@ -229,14 +229,32 @@
         </select>
       </label>
 
-      <label>
-        Amount
-        <input
-          type="number"
-          min="0"
-          formControlName="amount"
-        />
-      </label>
+<label>
+  Amount
+  <input
+    type="number"
+    min="0"
+    formControlName="amount"
+    [readonly]="
+      !!editingAppointment?.paid &&
+      auth.user?.role !== 'admin'
+    "
+    [class.locked-input]="
+      !!editingAppointment?.paid &&
+      auth.user?.role !== 'admin'
+    "
+  />
+
+  <small
+    class="locked-note"
+    *ngIf="
+      !!editingAppointment?.paid &&
+      auth.user?.role !== 'admin'
+    "
+  >
+    Paid amount can only be changed by an administrator.
+  </small>
+</label>
 
       <label class="wide">
         Scheduling note
@@ -245,18 +263,40 @@
           formControlName="note"
         ></textarea>
       </label>
+<label class="paid-field">
+  <input
+    type="checkbox"
+    formControlName="paid"
+    [attr.disabled]="
+      editingAppointment?.paid &&
+      auth.user?.role !== 'admin'
+        ? true
+        : null
+    "
+  />
 
-      <label class="paid-field">
-        <input
-          type="checkbox"
-          formControlName="paid"
-        />
+  <span>
+    <b>Payment received</b>
 
-        <span>
-          <b>Payment received</b>
-          <small>Mark this appointment as paid</small>
-        </span>
-      </label>
+    <small
+      *ngIf="
+        !editingAppointment?.paid ||
+        auth.user?.role === 'admin'
+      "
+    >
+      Mark this appointment as paid
+    </small>
+
+    <small
+      *ngIf="
+        editingAppointment?.paid &&
+        auth.user?.role !== 'admin'
+      "
+    >
+      Payment can only be changed by an administrator
+    </small>
+  </span>
+</label>
     </div>
 
     <div class="form-actions">

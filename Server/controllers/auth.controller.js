@@ -53,7 +53,10 @@ exports.login = async (req, res, next) => {
           !!user.canManageLocation,
         canTreatPatients:
           user.role === 'therapist' ||
-          !!user.canTreatPatients
+          !!user.canTreatPatients,
+        canCreateAnamnesis:
+          user.role === 'therapist' &&
+          !!user.canCreateAnamnesis
       }
     });
   } catch (error) {

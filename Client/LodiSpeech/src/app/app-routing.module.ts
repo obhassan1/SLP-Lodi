@@ -11,12 +11,14 @@ import { UsersComponent } from './components/users/users.component';
 import { AuthGuard } from './guards/auth.guard';
 import { TherapistGuard } from './guards/therapist.guard';
 import { AdminGuard } from './guards/admin.guard';
+import { AnamnesisComponent } from './components/anamnesis/anamnesis.component';
 
 const routes: Routes = [
   { path: '', component: LandingComponent },
   { path: 'staff-login', component: LoginComponent },
   { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
   { path: 'patients', component: PatientsComponent, canActivate: [AuthGuard] },
+  { path: 'patients/:id/anamnesis', component: AnamnesisComponent, canActivate: [AuthGuard, TherapistGuard] },
   { path: 'appointments', component: AppointmentsComponent, canActivate: [AuthGuard] },
   { path: 'payments', component: PaymentsComponent, canActivate: [AuthGuard] },
   {

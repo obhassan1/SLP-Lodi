@@ -1,0 +1,209 @@
+<section class="page anamnesis-page">
+  <header class="page-header">
+    <div>
+      <small>CONFIDENTIAL CLINICAL RECORD</small>
+      <h1>Anamnesis</h1>
+      <p *ngIf="patient">{{ patient.name }} · DOB {{ patient.dateOfBirth | date:'longDate' }} · Age {{ age }}</p>
+    </div>
+    <button class="cancel" type="button" (click)="back()">← Back to patients</button>
+  </header>
+
+  <p class="notice" *ngIf="loading">Loading anamnesis...</p>
+  <p class="error notice" *ngIf="error">{{ error }}</p>
+
+  <div class="permission-warning" *ngIf="!loading && !exists && !auth.user?.canCreateAnamnesis">
+    No anamnesis has been created for this patient. Your account can view/edit an existing report, but it cannot create a new one.
+  </div>
+
+  <form *ngIf="!loading && patient && (exists || auth.user?.canCreateAnamnesis)" (ngSubmit)="save()">
+    <section class="form-section">
+      <h2>Identifying and Family Information</h2>
+      <div class="grid two">
+        <label>Child's Name<input [value]="patient.name" disabled></label>
+        <label>Date of Birth<input [value]="patient.dateOfBirth | date:'yyyy-MM-dd'" disabled></label>
+        <label>Age<input [value]="age" disabled></label>
+        <label>Form Date<input type="date" [(ngModel)]="report.formDate" name="formDate"></label>
+        <label>Diagnosis (if any)<input [(ngModel)]="report.identifying.diagnosis" name="diagnosis"></label>
+        <label>Age of Diagnosis<input [(ngModel)]="report.identifying.ageOfDiagnosis" name="ageOfDiagnosis"></label>
+        <label>Mother's Name<input [(ngModel)]="report.identifying.motherName" name="motherName"></label>
+        <label>Mother's Occupation<input [(ngModel)]="report.identifying.motherOccupation" name="motherOccupation"></label>
+        <label>Father's Name<input [(ngModel)]="report.identifying.fatherName" name="fatherName"></label>
+        <label>Father's Occupation<input [(ngModel)]="report.identifying.fatherOccupation" name="fatherOccupation"></label>
+        <label>Child lives with<select [(ngModel)]="report.identifying.childLivesWith" name="childLivesWith"><option value="">Select...</option><option value="birth-parents">Birth parent(s)</option><option value="adoptive-parents">Adoptive parent(s)</option><option value="other">Other</option></select></label>
+        <label>Parents are<select [(ngModel)]="report.identifying.parentsStatus" name="parentsStatus"><option value="">Select...</option><option value="married">Married</option><option value="divorced">Divorced</option><option value="other">Other</option></select></label>
+      </div>
+
+      <div class="subsection">
+        <div class="sub-head"><h3>Other children in the family</h3><button type="button" class="small-btn" (click)="addSibling()">＋ Add child</button></div>
+        <div class="sibling-row" *ngFor="let sibling of report.identifying.siblings; let i=index">
+          <input [(ngModel)]="sibling.name" [name]="'sibName'+i" placeholder="Name">
+          <input [(ngModel)]="sibling.age" [name]="'sibAge'+i" placeholder="Age">
+          <input [(ngModel)]="sibling.speechHearingProblems" [name]="'sibProblem'+i" placeholder="Speech/Hearing Problems?">
+          <button type="button" class="remove" (click)="removeSibling(i)">×</button>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <label>Another language spoken at home?<select [(ngModel)]="report.identifying.otherLanguageAtHome" name="otherLanguageAtHome"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label *ngIf="report.identifying.otherLanguageAtHome==='yes'">Language<input [(ngModel)]="report.identifying.otherLanguage" name="otherLanguage"></label>
+        <label class="wide">Child's interests / motivators<textarea [(ngModel)]="report.identifying.interestsMotivators" name="interestsMotivators"></textarea></label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Birth History</h2>
+      <div class="grid two">
+        <label>Anything unusual about pregnancy or birth?<select [(ngModel)]="report.birthHistory.unusualPregnancyBirth" name="unusualPregnancyBirth"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Details<textarea [(ngModel)]="report.birthHistory.unusualPregnancyBirthDetails" name="unusualPregnancyBirthDetails"></textarea></label>
+        <label>Mother took medications / was ill?<select [(ngModel)]="report.birthHistory.motherMedicationOrIllness" name="motherMedicationOrIllness"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Details<textarea [(ngModel)]="report.birthHistory.motherMedicationOrIllnessDetails" name="motherMedicationOrIllnessDetails"></textarea></label>
+        <label>Pregnancy full-term?<select [(ngModel)]="report.birthHistory.fullTerm" name="fullTerm"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Delivery<select [(ngModel)]="report.birthHistory.delivery" name="delivery"><option value="">Select...</option><option value="vaginal">Vaginal</option><option value="planned-cesarean">Planned cesarean</option><option value="emergency-cesarean">Emergency cesarean</option></select></label>
+        <label>Hospitalized after birth?<select [(ngModel)]="report.birthHistory.hospitalizedAfterBirth" name="hospitalizedAfterBirth"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>For what and how long?<textarea [(ngModel)]="report.birthHistory.hospitalizationDetails" name="hospitalizationDetails"></textarea></label>
+        <label>Medical complications at birth?<select [(ngModel)]="report.birthHistory.medicalComplicationsAtBirth" name="medicalComplicationsAtBirth"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label class="wide">Other pertinent information about mother or baby<textarea [(ngModel)]="report.birthHistory.otherPertinentInformation" name="otherPertinentInformation"></textarea></label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Medical History</h2>
+      <h3>Has your child had any of the following?</h3>
+      <div class="checks three">
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.adenoidectomy" name="adenoidectomy"> Adenoidectomy</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.breathingDifficultiesAsthma" name="asthma"> Breathing Difficulties/Asthma</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.chickenPox" name="chickenPox"> Chicken Pox</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.earInfections" name="earInfections"> Ear Infections</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.earTubes" name="earTubes"> Ear Tubes</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.headInjury" name="headInjury"> Head Injury</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.highFevers" name="highFevers"> High Fevers</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.meningitis" name="meningitis"> Meningitis</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.seizures" name="seizures"> Seizures</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.sleepingDifficulties" name="sleepingDifficulties"> Sleeping Difficulties</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.tonsillectomy" name="tonsillectomy"> Tonsillectomy</label>
+        <label><input type="checkbox" [(ngModel)]="report.medicalHistory.conditions.visionProblems" name="visionProblems"> Vision Problems</label>
+      </div>
+      <div class="grid two">
+        <label>Ear infections — how often/many?<input [(ngModel)]="report.medicalHistory.conditions.earInfectionsDetails" name="earInfectionsDetails"></label>
+        <label>Ear tubes — when?<input [(ngModel)]="report.medicalHistory.conditions.earTubesDetails" name="earTubesDetails"></label>
+        <label>Questioned ability to hear normally?<select [(ngModel)]="report.medicalHistory.questionedHearing" name="questionedHearing"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>If yes, explain<textarea [(ngModel)]="report.medicalHistory.questionedHearingDetails" name="questionedHearingDetails"></textarea></label>
+        <label>Hearing tested?<select [(ngModel)]="report.medicalHistory.hearingTested" name="hearingTested"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Results<textarea [(ngModel)]="report.medicalHistory.hearingTestResults" name="hearingTestResults"></textarea></label>
+        <label>Questioned ability to see normally?<select [(ngModel)]="report.medicalHistory.questionedVision" name="questionedVision"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>If yes, explain<textarea [(ngModel)]="report.medicalHistory.questionedVisionDetails" name="questionedVisionDetails"></textarea></label>
+        <label>Vision tested?<select [(ngModel)]="report.medicalHistory.visionTested" name="visionTested"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Results<textarea [(ngModel)]="report.medicalHistory.visionTestResults" name="visionTestResults"></textarea></label>
+        <label class="wide">Other serious injuries / surgeries<textarea [(ngModel)]="report.medicalHistory.injuriesSurgeries" name="injuriesSurgeries"></textarea></label>
+        <label class="wide">Current medications and purpose<textarea [(ngModel)]="report.medicalHistory.medications" name="medications"></textarea></label>
+        <label class="wide">Precautions (food allergies, aggressive behavior, decreased safety awareness, etc.)<textarea [(ngModel)]="report.medicalHistory.precautions" name="precautions"></textarea></label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Developmental History</h2>
+      <div class="grid two">
+        <label>Concerns about overall development?<select [(ngModel)]="report.developmentalHistory.overallDevelopmentConcerns" name="overallDevelopmentConcerns"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>If yes, what are they?<textarea [(ngModel)]="report.developmentalHistory.overallDevelopmentConcernsDetails" name="overallDevelopmentConcernsDetails"></textarea></label>
+      </div>
+      <h3>Approximate age developmental milestones were achieved</h3>
+      <div class="grid three">
+        <label>Babbled<input [(ngModel)]="report.developmentalHistory.milestones.babbled" name="babbled"></label>
+        <label>Used single words<input [(ngModel)]="report.developmentalHistory.milestones.singleWords" name="milestoneSingleWords"></label>
+        <label>Began combining words<input [(ngModel)]="report.developmentalHistory.milestones.combiningWords" name="combiningWords"></label>
+        <label>Walked independently<input [(ngModel)]="report.developmentalHistory.milestones.walkedIndependently" name="walkedIndependently"></label>
+        <label>Ate table foods<input [(ngModel)]="report.developmentalHistory.milestones.ateTableFoods" name="ateTableFoods"></label>
+        <label>Toilet trained<input [(ngModel)]="report.developmentalHistory.milestones.toiletTrained" name="toiletTrained"></label>
+      </div>
+      <div class="grid two">
+        <label>Choke/cough when eating or drinking?<select [(ngModel)]="report.developmentalHistory.chokeCoughEatingDrinking" name="chokeCough"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Difficulty chewing certain textures?<select [(ngModel)]="report.developmentalHistory.difficultyChewingTextures" name="chewingTextures"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Currently puts toys/objects in mouth?<select [(ngModel)]="report.developmentalHistory.mouthsObjects" name="mouthsObjects"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Brushes teeth / allows brushing?<select [(ngModel)]="report.developmentalHistory.toothBrushing" name="toothBrushing"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Is a picky eater?<select [(ngModel)]="report.developmentalHistory.pickyEater" name="pickyEater"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Speech-Language History</h2>
+      <div class="grid two">
+        <label>Do you feel the child has a speech/language problem?<select [(ngModel)]="report.speechLanguageHistory.speechLanguageProblem" name="speechLanguageProblem"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>If yes, describe<textarea [(ngModel)]="report.speechLanguageHistory.speechLanguageProblemDetails" name="speechLanguageProblemDetails"></textarea></label>
+        <label>Previous speech evaluation/screening?<select [(ngModel)]="report.speechLanguageHistory.previousEvaluation" name="previousEvaluation"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>When, where, and what were you told?<textarea [(ngModel)]="report.speechLanguageHistory.previousEvaluationDetails" name="previousEvaluationDetails"></textarea></label>
+      </div>
+
+      <div class="split-checks">
+        <div><h3>My child…</h3>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.childAbilities.repeatsSoundsWordsPhrases" name="repeats"> Repeats sounds, words, or phrases</label>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.childAbilities.understandsWords" name="understandsWords"> Understands words</label>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.childAbilities.understandsSentences" name="understandsSentences"> Understands sentences</label>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.childAbilities.understandsConversation" name="understandsConversation"> Understands conversation</label>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.childAbilities.retrievesCommonObjects" name="retrievesObjects"> Retrieves/points to common objects upon request</label>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.childAbilities.respondsWhQuestions" name="whQuestions"> Responds correctly to “wh” questions</label>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.childAbilities.asksQuestions" name="asksQuestions"> Asks questions of others</label>
+        </div>
+        <div><h3>Currently communicates using…</h3>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.communicationMethods.cryingTantrums" name="crying"> Crying or tantrums</label>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.communicationMethods.bodyLanguage" name="bodyLanguage"> Body language / pointing / gesturing</label>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.communicationMethods.sounds" name="sounds"> Sounds (vowels, grunting)</label>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.communicationMethods.singleWords" name="commSingleWords"> Single words</label>
+          <label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.communicationMethods.twoToFourWordSentences" name="twoFourWords"> 2 to 4 word sentences</label>
+        </div>
+      </div>
+
+      <div class="grid two">
+        <label>Difficult to understand by you?<select [(ngModel)]="report.speechLanguageHistory.difficultToUnderstandByYou" name="difficultByYou"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Difficult to understand by others?<select [(ngModel)]="report.speechLanguageHistory.difficultToUnderstandByOthers" name="difficultByOthers"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+      </div>
+
+      <div class="split-checks three-cols">
+        <div><h3>Speech Sounds</h3><label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.speechSounds.omitsSounds" name="omitsSounds"> Omits sounds</label><label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.speechSounds.distortsSounds" name="distortsSounds"> Distorts sounds</label><label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.speechSounds.substitutesSounds" name="substitutesSounds"> Substitutes sounds</label></div>
+        <div><h3>Language</h3><label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.language.wordOrder" name="wordOrder"> Word order</label><label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.language.omitsWords" name="omitsWords"> Omits words</label><label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.language.speaksOnlyWordsPhrases" name="onlyWordsPhrases"> Speaks in only words/phrases</label></div>
+        <div><h3>Fluency / Voice</h3><label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.fluencyVoice.wordSoundRepetitions" name="wordSoundReps"> Word or sound repetitions</label><label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.fluencyVoice.frequentLongPauses" name="longPauses"> Frequent and/or long pauses</label><label><input type="checkbox" [(ngModel)]="report.speechLanguageHistory.fluencyVoice.frequentUmUh" name="umUh"> Frequent use of “um” or “uh”</label></div>
+      </div>
+      <label class="block-label">Extra Information<textarea [(ngModel)]="report.speechLanguageHistory.extraInformation" name="speechExtraInformation"></textarea></label>
+    </section>
+
+    <section class="form-section">
+      <h2>Social Interaction</h2>
+      <div class="grid two">
+        <label>Interacts with other children?<select [(ngModel)]="report.socialInteraction.interactsWithChildren" name="interactsChildren"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Describe interaction with children<textarea [(ngModel)]="report.socialInteraction.childrenInteractionDetails" name="childrenInteractionDetails"></textarea></label>
+        <label>Interacts with adults?<select [(ngModel)]="report.socialInteraction.interactsWithAdults" name="interactsAdults"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label>Describe interaction with adults<textarea [(ngModel)]="report.socialInteraction.adultsInteractionDetails" name="adultsInteractionDetails"></textarea></label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Play Skills</h2>
+      <div class="grid two">
+        <label>Prefers to play with<select [(ngModel)]="report.playSkills.preferredPlayCompany" name="preferredPlayCompany"><option value="">Select...</option><option value="alone">Alone</option><option value="children">Children</option><option value="adults">Adults</option><option value="mixed">Mixed / varies</option></select></label>
+        <label>Screen Time<input [(ngModel)]="report.playSkills.screenTime" name="screenTime"></label>
+        <label class="wide">Preferred games and toys<textarea [(ngModel)]="report.playSkills.gamesAndToys" name="gamesAndToys"></textarea></label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Education History</h2>
+      <div class="grid two">
+        <label>Name of school and grade<input [(ngModel)]="report.educationHistory.schoolAndGrade" name="schoolAndGrade"></label>
+        <label>Specialized/additional school services?<select [(ngModel)]="report.educationHistory.specializedServices" name="specializedServices"><option value="">Select...</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+        <label class="wide">Strengths and/or best subjects<textarea [(ngModel)]="report.educationHistory.strengthsBestSubjects" name="strengthsBestSubjects"></textarea></label>
+        <label class="wide">More challenging subjects<textarea [(ngModel)]="report.educationHistory.challengingSubjects" name="challengingSubjects"></textarea></label>
+        <label class="wide">If receiving specialized/additional services, explain<textarea [(ngModel)]="report.educationHistory.specializedServicesDetails" name="specializedServicesDetails"></textarea></label>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <h2>Additional Comments / Concerns</h2>
+      <label class="block-label"><textarea rows="6" [(ngModel)]="report.additionalCommentsConcerns" name="additionalCommentsConcerns"></textarea></label>
+    </section>
+
+    <div class="save-bar">
+      <div><strong>{{ exists ? 'Existing anamnesis' : 'New anamnesis' }}</strong><small *ngIf="exists && report.updatedAt">Last updated {{ report.updatedAt | date:'medium' }}</small></div>
+      <span class="success" *ngIf="message">{{ message }}</span>
+      <button class="primary" type="submit" [disabled]="saving">{{ saving ? 'Saving...' : (exists ? 'Save changes' : 'Create anamnesis') }}</button>
+    </div>
+  </form>
+</section>

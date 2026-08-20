@@ -200,3 +200,16 @@
   background: #9a6110;
   color: #ffffff;
 }
+
+.locked-input {
+  background: #f5f3f6;
+  color: #766d7b;
+  cursor: not-allowed;
+}
+
+.locked-note {
+  display: block;
+  margin-top: 6px;
+  color: #8b7c91;
+  font-size: 11px;
+}

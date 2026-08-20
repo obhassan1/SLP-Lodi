@@ -24,6 +24,7 @@
       <b>Status</b>
       <b>Location access</b>
       <b>Treating patients</b>
+      <b>Create anamnesis</b>
       <b>Action</b>
     </div>
 
@@ -51,6 +52,15 @@
 
       <span>
         {{ user.role === 'therapist' || user.canTreatPatients ? 'Yes' : 'No' }}
+      </span>
+
+      <span>
+        {{
+  (user.role === 'therapist' || user.role === 'admin') &&
+  user.canCreateAnamnesis
+    ? 'Allowed'
+    : 'Not allowed'
+}}
       </span>
 
       <button
@@ -166,6 +176,20 @@
           formControlName="canTreatPatients"
         />
         <span>Works as a therapist and can receive appointments</span>
+      </label>
+
+      <label
+        class="active-field wide"
+        *ngIf="
+  form.get('role')?.value === 'therapist' ||
+  form.get('role')?.value === 'admin'
+"
+      >
+        <input
+          type="checkbox"
+          formControlName="canCreateAnamnesis"
+        />
+        <span>Can create the patient's one-time anamnesis report</span>
       </label>
 
       <p class="wide error" *ngIf="error">

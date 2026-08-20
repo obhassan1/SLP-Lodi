@@ -15,7 +15,13 @@ exports.requireAuth = async (req, res, next) => { try {
         username: user.username,
         role: user.role,
         canManageLocation: !!user.canManageLocation,
-        canTreatPatients: user.role === 'therapist' || !!user.canTreatPatients
+        canTreatPatients: user.role === 'therapist' || !!user.canTreatPatients,
+        canCreateAnamnesis:
+  (
+    user.role === 'therapist' ||
+    user.role === 'admin'
+  ) &&
+  !!user.canCreateAnamnesis
     };
     next();
 }

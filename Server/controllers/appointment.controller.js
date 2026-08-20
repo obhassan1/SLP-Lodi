@@ -89,60 +89,165 @@ exports.create = async (req, res, next) => {
 exports.update = async (req, res, next) => {
     try {
         const appointment = await Appointment.findById(req.params.id);
+
         if (!appointment) {
-            return res.status(404).json({ message: 'Appointment not found' });
-        }
-        const isOwner = String(appointment.therapist) === String(req.user.id);
-        if (req.user.role !== 'admin' && !isOwner) {
-            return res.status(403).json({
-                message: 'You can only edit your own appointments'
+            return res.status(404).json({
+                message: 'Appointment not found'
             });
         }
+
+        const isOwner =
+            String(appointment.therapist) ===
+            String(req.user.id);
+
+        if (
+            req.user.role !== 'admin' &&
+            !isOwner
+        ) {
+            return res.status(403).json({
+                message:
+                    'You can only edit your own appointments'
+            });
+        }
+
+        /*
+         * Normal therapists cannot change location
+         * unless they have location permission.
+         */
         if (
             req.user.role !== 'admin' &&
             req.body.location !== undefined &&
             !req.user.canManageLocation
         ) {
             return res.status(403).json({
-                message: 'You do not have permission to change appointment locations'
+                message:
+                    'You do not have permission to change appointment locations'
             });
         }
 
-        const patientId = req.body.patient || appointment.patient;
-        const therapistId = req.user.role === 'admin'
-            ? (req.body.therapist || appointment.therapist)
-            : appointment.therapist;
-        if (req.user.role === 'admin' && req.body.therapist) {
-            const treatingUser = await User.findOne({
-                _id: therapistId,
-                active: true,
-                $or: [
-                    { role: 'therapist' },
-                    { canTreatPatients: true }
-                ]
-            });
-            if (!treatingUser) {
-                return res.status(400).json({
-                    message: 'Selected user is not enabled as a therapist'
+        /*
+         * =====================================================
+         * PAID APPOINTMENT PROTECTION
+         * =====================================================
+         *
+         * Once an appointment is already paid:
+         *
+         * ADMIN:
+         * - Can change amount
+         * - Can change paid/unpaid
+         *
+         * THERAPIST:
+         * - Cannot change amount
+         * - Cannot mark it unpaid
+         *
+         * Therapists may still edit the other appointment
+         * information.
+         */
+        if (
+            req.user.role !== 'admin' &&
+            appointment.paid === true
+        ) {
+            if (
+                req.body.amount !== undefined &&
+                Number(req.body.amount) !==
+                Number(appointment.amount)
+            ) {
+                return res.status(403).json({
+                    message:
+                        'Only an administrator can change the amount of a paid appointment'
+                });
+            }
+
+            if (
+                req.body.paid !== undefined &&
+                req.body.paid === false
+            ) {
+                return res.status(403).json({
+                    message:
+                        'Only an administrator can mark a paid appointment as unpaid'
                 });
             }
         }
-        const patient = await Patient.findById(patientId);
 
-        if (!patient) {
-            return res.status(404).json({ message: 'Patient not found' });
+
+        const patientId =
+            req.body.patient ||
+            appointment.patient;
+
+        const therapistId =
+            req.user.role === 'admin'
+                ? (
+                    req.body.therapist ||
+                    appointment.therapist
+                )
+                : appointment.therapist;
+
+
+        /*
+         * Validate therapist when admin changes therapist.
+         */
+        if (
+            req.user.role === 'admin' &&
+            req.body.therapist
+        ) {
+            const treatingUser =
+                await User.findOne({
+                    _id: therapistId,
+                    active: true,
+                    $or: [
+                        {
+                            role: 'therapist'
+                        },
+                        {
+                            canTreatPatients: true
+                        }
+                    ]
+                });
+
+            if (!treatingUser) {
+                return res.status(400).json({
+                    message:
+                        'Selected user is not enabled as a therapist'
+                });
+            }
         }
 
-        const therapistAssigned = patient.assignedTherapists.some(id =>
-            String(id) === String(therapistId)
-        );
 
-        if (!therapistAssigned) {
-            return res.status(400).json({
-                message: 'Selected therapist is not assigned to this patient'
+        /*
+         * Validate patient.
+         */
+        const patient =
+            await Patient.findById(patientId);
+
+        if (!patient) {
+            return res.status(404).json({
+                message: 'Patient not found'
             });
         }
 
+
+        /*
+         * Make sure therapist is assigned
+         * to this patient.
+         */
+        const therapistAssigned =
+            patient.assignedTherapists.some(
+                id =>
+                    String(id) ===
+                    String(therapistId)
+            );
+
+        if (!therapistAssigned) {
+            return res.status(400).json({
+                message:
+                    'Selected therapist is not assigned to this patient'
+            });
+        }
+
+
+        /*
+         * Fields that may be updated.
+         */
         const allowedFields = [
             'patient',
             'therapist',
@@ -154,32 +259,91 @@ exports.update = async (req, res, next) => {
             'amount',
             'note'
         ];
+
         const update = {};
+
         for (const field of allowedFields) {
             if (req.body[field] !== undefined) {
-                update[field] = req.body[field];
+                update[field] =
+                    req.body[field];
             }
         }
+
+
+        /*
+         * Normal therapist protections.
+         */
         if (req.user.role !== 'admin') {
+
+            /*
+             * Therapist cannot reassign appointment.
+             */
             delete update.therapist;
+
+            /*
+             * Therapist cannot change location
+             * without permission.
+             */
             if (!req.user.canManageLocation) {
                 delete update.location;
             }
+
+            /*
+             * Extra server-side protection:
+             * if the appointment was already paid,
+             * force the original financial values.
+             */
+            if (appointment.paid === true) {
+                update.amount =
+                    appointment.amount;
+
+                update.paid = true;
+            }
         }
+
+
         /*
-         * A cancelled appointment should never carry money.
-         * This covers both "cancelling now" (status included in
-         * this update) and "already cancelled" (status left as-is).
+         * =====================================================
+         * CANCELLED APPOINTMENTS
+         * =====================================================
+         *
+         * Cancelled appointments never carry money,
+         * regardless of user role.
          */
-        const resultingStatus = update.status || appointment.status;
+        const resultingStatus =
+            update.status ||
+            appointment.status;
+
         if (resultingStatus === 'cancelled') {
             update.paid = false;
             update.amount = 0;
         }
-        const updated = await Appointment.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true })
-            .populate('patient', 'name therapyFocus')
-            .populate('therapist', 'name username');
+
+
+        /*
+         * Save update.
+         */
+        const updated =
+            await Appointment.findByIdAndUpdate(
+                req.params.id,
+                update,
+                {
+                    new: true,
+                    runValidators: true
+                }
+            )
+            .populate(
+                'patient',
+                'name therapyFocus'
+            )
+            .populate(
+                'therapist',
+                'name username'
+            );
+
+
         res.json(updated);
+
     }
     catch (error) {
         next(error);

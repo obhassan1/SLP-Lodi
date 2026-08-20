@@ -1,7 +1,11 @@
 const router = require('express').Router();
 const c = require('../controllers/patient.controller');
+const anamnesis = require('../controllers/anamnesis.controller');
 router.get('/', c.list);
 router.post('/', c.create);
+router.get('/:id/anamnesis', anamnesis.get);
+router.post('/:id/anamnesis', anamnesis.create);
+router.put('/:id/anamnesis', anamnesis.update);
 router.get('/:id', c.get);
 router.put('/:id', c.update);
 router.put('/:id/assign', c.assign);

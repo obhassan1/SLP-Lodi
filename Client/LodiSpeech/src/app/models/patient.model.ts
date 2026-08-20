@@ -8,6 +8,7 @@ export interface User {
     active: boolean;
     canManageLocation?: boolean;
     canTreatPatients?: boolean;
+    canCreateAnamnesis?: boolean;
 }
 export interface SessionNote {
     _id?: string;

@@ -24,7 +24,20 @@
     </article>
 
     <article class="panel detail" *ngIf="selected">
-      <h2>{{selected.name}}</h2>
+      <div class="patient-title-row">
+        <h2>{{selected.name}}</h2>
+        <button
+  *ngIf="
+    auth.user?.role === 'therapist' ||
+    auth.user?.role === 'admin'
+  "
+  class="anamnesis-btn"
+  type="button"
+  (click)="openAnamnesis()"
+>
+  Anamnesis
+</button>
+      </div>
       <p>DOB: {{selected.dateOfBirth | date:'longDate'}}</p>
 
       <div class="info">
